@@ -9,7 +9,11 @@ public class PlayerMain : MonoBehaviour
     public Animator masterAnim;
     private float animResetTimer = 0f;
 
-    public int health;
+    public PlayerUI ui;
+
+    public int health = 10;
+    private bool isInvincible = false;
+    private float iFrames = 0f;
     public bool hasSpecial;
     public string currSpecial;
 
@@ -78,6 +82,11 @@ public class PlayerMain : MonoBehaviour
         {
             cam.GetComponent<CameraFollow>().SwapFreeze(false);
         }
+        if(Input.GetKeyDown("l"))
+        {
+            ApplyDamage(3);
+            //print("Bing");
+        }
         if (playerState == JUMP_STATE)
         {
             if (!setLanding)
@@ -108,6 +117,18 @@ public class PlayerMain : MonoBehaviour
         AttackInputs();
         StateMachine();
 
+        if (iFrames > 0)
+        {
+            sprite.color = new Color(1, 1, 1, .6f);
+            iFrames -= Time.deltaTime;
+        }
+        else
+        {
+            sprite.color = new Color(1, 1, 1);
+            iFrames = 0;
+            isInvincible = false;
+        }
+
     }
     private void FixedUpdate()
     {
@@ -116,6 +137,17 @@ public class PlayerMain : MonoBehaviour
         if (Input.GetAxisRaw("Horizontal") < 0) transform.localScale = new Vector3(-1f, 1f, 1);
         if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
         
+    }
+
+    public void ApplyDamage(int damage)
+    {
+        if(!isInvincible)
+        {
+            health -= damage;
+            isInvincible = true;
+            iFrames = 2;
+        }
+        ui.UpdateHealth();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

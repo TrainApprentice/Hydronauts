@@ -6,6 +6,9 @@ using System;
 
 public class EnemyAI : MonoBehaviour
 {
+    public Animator AnimController;
+    public EnemyMain master;
+
     public Transform target;
     private Vector3 punchTarget;
 
@@ -51,7 +54,7 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (path == null) return;
+        if (path == null || master.isStunned) return;
 
         if (attackCooldown > 0) attackCooldown -= Time.fixedDeltaTime;
         if (pathWait > 0) pathWait -= Time.fixedDeltaTime;
@@ -85,13 +88,15 @@ public class EnemyAI : MonoBehaviour
         } else
         {
             reachedEndOfPath = false;
-            
             // Still walking
         }
 
         Vector2 dir = ((Vector2)path.vectorPath[currentWaypoint] - new Vector2(transform.position.x, transform.position.y)).normalized;
 
+        if (dir != Vector2.zero) AnimController.SetBool("isWalking", true);
+
         transform.position += new Vector3(dir.x * speed * Time.fixedDeltaTime, dir.y * speed * Time.fixedDeltaTime, 0);
+        
         
         float dist = Vector2.Distance(transform.position, path.vectorPath[currentWaypoint]);
         if (dist < nextWaypointDistance) currentWaypoint++;
@@ -100,7 +105,9 @@ public class EnemyAI : MonoBehaviour
     }
 
     private IEnumerator MeleeAttack()
-    { 
+    {
+        AnimController.SetBool("isWalking", false);
+        if(!AnimController.GetBool("doAttack")) AnimController.SetBool("doAttack", true);
         isAttacking = true;
         attackTimer -= Time.deltaTime;
         if(attackTimer <= 0)
@@ -109,6 +116,7 @@ public class EnemyAI : MonoBehaviour
             UpdatePath();
             attackTimer = 1;
             attackCooldown = 3f;
+            AnimController.SetBool("doAttack", false);
         }
         yield return new WaitForSeconds(Time.deltaTime);
     }
@@ -124,6 +132,9 @@ public class EnemyAI : MonoBehaviour
 
     void UpdatePath()
     {
-        if (seeker.IsDone()) seeker.StartPath(transform.position, punchTarget, OnPathComplete);
+        if (seeker.IsDone())
+        {
+            seeker.StartPath(transform.position, punchTarget, OnPathComplete);
+        }
     }
 }

@@ -37,8 +37,8 @@ public class GameManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
-        if(inEncounter && currEnemies < killGoal)
+        UpdateEnemies();
+        if (inEncounter && currEnemies < killGoal)
         {
             if (enemySpawnCooldown > 0) enemySpawnCooldown -= Time.fixedDeltaTime;
             else
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
                 enemySpawnCooldown = .3f;
             }
         }
-        UpdateEnemies();
+        
         
 
         if (killCount >= killGoal && inEncounter) EndEncounter();
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
                 Destroy(enemies[i].gameObject);
                 enemies.Remove(enemies[i]);
                 
-                killCount++;
+                if(inEncounter) killCount++;
             }
         }
     }
