@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     private Camera cam;
     private GameObject lWall, rWall;
+    public GameObject pauseMenu;
 
     private GameObject baseEnemy, baseWall;
     private List<EnemyMain> enemies = new List<EnemyMain>();
@@ -34,10 +35,20 @@ public class GameManager : MonoBehaviour
         baseEnemy = Resources.Load<GameObject>("Prefab/Enemy");
         baseWall = Resources.Load<GameObject>("Prefab/Wall");
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown("p"))
+        {
+            print("Ping");
+            if (Time.timeScale == 0) ResumeGame();
+            else PauseGame();
+        }
+    }
 
     private void FixedUpdate()
     {
         UpdateEnemies();
+
         if (inEncounter && currEnemies < killGoal)
         {
             if (enemySpawnCooldown > 0) enemySpawnCooldown -= Time.fixedDeltaTime;
@@ -56,6 +67,17 @@ public class GameManager : MonoBehaviour
         if (killCount >= killGoal && inEncounter) EndEncounter();
     }
 
+
+    void PauseGame()
+    {
+        Time.timeScale = 0;
+        pauseMenu.SetActive(true);
+    }
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        pauseMenu.SetActive(false);
+    }
     private void UpdateEnemies()
     {
         for(int i = 0; i < enemies.Count; i++)
