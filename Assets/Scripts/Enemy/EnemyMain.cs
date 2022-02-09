@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyMain : MonoBehaviour
-{
-    public EnemyAI AIController;
+{   
 
     public Animator masterAnim;
     private float animResetTimer = 0f;
 
     public GameObject healthBar, barBack;
+    public int enemyType = 0; // 1 for Melee, 2 for Ranged
     
     public float health = 15f;
     public float maxHealth = 15f;
@@ -25,6 +25,10 @@ public class EnemyMain : MonoBehaviour
         float rand = Random.Range(0, 2);
         if (rand < 1) transform.localScale = new Vector3(-.2f, .2f, 1);
         else transform.localScale = new Vector3(.2f, .2f, 1);
+
+        if (GetComponent<MeleeEnemyAI>()) enemyType = 1;
+        else if (GetComponent<RangedEnemyAI>()) enemyType = 2;
+
     }
 
     // Update is called once per frame

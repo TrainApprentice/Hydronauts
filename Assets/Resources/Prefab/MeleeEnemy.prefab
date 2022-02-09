@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: -9038818831028711314}
   - component: {fileID: 8494680217782790227}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: MeleeEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -307,13 +307,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5979118262283460890}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e151b07de803814780740c968f254ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 97ddfe3377dd2ef40bda0a6a2ec43a79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIController: {fileID: 8494680217782790227}
   masterAnim: {fileID: 3546871086593666562}
   healthBar: {fileID: 4551376610986099787}
   barBack: {fileID: 7517662508267426141}
+  enemyType: 0
   health: 15
   maxHealth: 15
   isDead: 0

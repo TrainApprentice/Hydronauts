@@ -29,6 +29,7 @@ public class PlayerMain : MonoBehaviour
 
     private int playerState, animState;
     private bool canAttack = true;
+    private bool isWalking = false;
 
     private float landingY;
     private bool setLanding = false;
@@ -36,6 +37,8 @@ public class PlayerMain : MonoBehaviour
     private float comboTimer = .3f;
     private List<int> comboSequence = new List<int>();
     private int[] uppercutCombo = new int[4] { 1, 1, 2, 1 };
+    private int[] slamCombo = new int[5] { 1, 1, 2, 1, 2 };
+    private int[] longHitCombo = new int[5] { 1, 2, 1, 2, 2 };
     private float attackCooldown = .1f;
 
     private GameObject shadow;
@@ -57,18 +60,32 @@ public class PlayerMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //print(animResetTimer);
         movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical") * .75f;
 
         //print(comboTimer);
 
+        if(movement != Vector2.zero && !isWalking)
+        {
+            AnimUpdate("walking");
+            isWalking = true;
+        }
+        if(movement == Vector2.zero)
+        {
+            isWalking = false;
+            AnimUpdate("walking", false);
+        }
+        
         if (animResetTimer > 0) animResetTimer -= Time.deltaTime;
         else
         {
             animResetTimer = 0;
-            masterAnim.SetBool("basicLight", false);
-            masterAnim.SetBool("basicHeavy", false);
-            masterAnim.SetBool("upperCut", false);
+            AnimUpdate("basicLight", false);
+            AnimUpdate("basicHeavy", false);
+            AnimUpdate("upperCut", false);
+            AnimUpdate("groundSlam", false);
+            AnimUpdate("longHit", false);
 
         }
 
@@ -206,7 +223,6 @@ public class PlayerMain : MonoBehaviour
         {
             comboTimer = 0;
             comboSequence.Clear();
-            AnimUpdate("reset");
         }
         if(!canAttack)
         {
@@ -264,6 +280,16 @@ public class PlayerMain : MonoBehaviour
             AnimUpdate("upperCut");
             //Clear combos at end of sequence
         }
+        else if(CompareIntArrays(tempArray, slamCombo))
+        {
+            AnimUpdate("groundSlam");
+            comboSequence.Clear();
+        }
+        else if(CompareIntArrays(tempArray, longHitCombo))
+        {
+            AnimUpdate("longHit");
+            comboSequence.Clear();
+        }
         else
         {
             if (type == "light")
@@ -280,10 +306,10 @@ public class PlayerMain : MonoBehaviour
         
     }
 
-    private void AnimUpdate(string varUpdate)
+    private void AnimUpdate(string varUpdate, bool setVal = true)
     {
-        masterAnim.SetBool(varUpdate, true);
-        animResetTimer = .1f;
+        masterAnim.SetBool(varUpdate, setVal);
+        if(varUpdate != "walking") animResetTimer = .1f;
 
         
     }

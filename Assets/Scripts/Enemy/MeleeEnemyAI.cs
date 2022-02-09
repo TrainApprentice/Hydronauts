@@ -4,7 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using System;
 
-public class EnemyAI : MonoBehaviour
+public class MeleeEnemyAI : MonoBehaviour
 {
     public Animator AnimController;
     public EnemyMain master;
@@ -20,7 +20,6 @@ public class EnemyAI : MonoBehaviour
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
 
-    int enemyType = 0; // 0 for Melee, 1 for Ranged
     float attackTimer = 1f;
     float attackCooldown = 1f;
     public bool isAttacking = false;

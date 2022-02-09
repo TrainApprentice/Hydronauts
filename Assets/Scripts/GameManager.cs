@@ -11,9 +11,10 @@ public class GameManager : MonoBehaviour
     private GameObject lWall, rWall;
     public GameObject pauseMenu;
 
-    private GameObject baseEnemy, baseWall;
+    private GameObject baseMeleeEnemy, baseRangedEnemy, baseWall;
     private List<EnemyMain> enemies = new List<EnemyMain>();
     private bool inEncounter = false;
+    private int currEncounter = 0;
     public int killCount = 0;
     private int killGoal = 0;
     private int currEnemies = 0;
@@ -32,14 +33,14 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
-        baseEnemy = Resources.Load<GameObject>("Prefab/Enemy");
+        baseMeleeEnemy = Resources.Load<GameObject>("Prefab/MeleeEnemy");
+        baseRangedEnemy = Resources.Load<GameObject>("Prefab/RangedEnemy");
         baseWall = Resources.Load<GameObject>("Prefab/Wall");
     }
     private void Update()
     {
         if (Input.GetKeyDown("p"))
         {
-            print("Ping");
             if (Time.timeScale == 0) ResumeGame();
             else PauseGame();
         }
@@ -55,8 +56,25 @@ public class GameManager : MonoBehaviour
             else
             {
                 var randSpawn = new Vector3(Random.Range(lWall.transform.position.x + 1f, rWall.transform.position.x - 1f), Random.Range(lWall.transform.position.y + 3f, lWall.transform.position.y - 2f), 0f);
-                GameObject newEnemy = Instantiate(baseEnemy, randSpawn, Quaternion.identity);
-                enemies.Add(newEnemy.GetComponent<EnemyMain>());
+                GameObject newEnemy;
+
+                switch(currEncounter)
+                {
+                    case 1:
+                        newEnemy = Instantiate(baseRangedEnemy, randSpawn, Quaternion.identity);
+                        enemies.Add(newEnemy.GetComponent<EnemyMain>());
+                        break;
+                    case 2:
+                        newEnemy = (currEnemies % 4 == 0) ? Instantiate(baseRangedEnemy, randSpawn, Quaternion.identity) : Instantiate(baseMeleeEnemy, randSpawn, Quaternion.identity);
+                        enemies.Add(newEnemy.GetComponent<EnemyMain>());
+                        break;
+                    case 3:
+                        newEnemy = (currEnemies % 2 == 0) ? Instantiate(baseRangedEnemy, randSpawn, Quaternion.identity) : Instantiate(baseMeleeEnemy, randSpawn, Quaternion.identity);
+                        enemies.Add(newEnemy.GetComponent<EnemyMain>());
+                        break;
+                }
+
+                
                 currEnemies++;
                 enemySpawnCooldown = .3f;
             }
@@ -94,11 +112,11 @@ public class GameManager : MonoBehaviour
 
     public void StartEncounter(int num)
     {
-        
+        currEncounter = num;
         switch(num)
         {
             case 1:
-                killGoal = 5;
+                killGoal = 1;
                 break;
             case 2:
                 killGoal = 10;
@@ -121,6 +139,7 @@ public class GameManager : MonoBehaviour
         killCount = 0;
         killGoal = 0;
         currEnemies = 0;
+        currEncounter = 0;
         inEncounter = false;
         Destroy(rWall);
         Destroy(lWall);
