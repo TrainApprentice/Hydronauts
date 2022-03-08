@@ -7,38 +7,39 @@ public class PlayerUI : MonoBehaviour
 {
 
     public PlayerMain playerRef;
-
     public GameObject healthBar;
-
-    private Image health;
-
-    public Transform healthBarBase;
+    public GameObject specialMeterNeedle;
 
     private List<Image> bars = new List<Image>();
 
     private void Start()
     {
         
-        health = healthBar.GetComponent<Image>();
+    }
+
+    private void Update()
+    {
+        UpdateSpecialMeter();
         UpdateHealth();
     }
 
     public void UpdateHealth()
     {
-        print(playerRef.health);
+        float p = (float)playerRef.health / playerRef.maxHealth;
+        Vector3 scaleGoal = new Vector3(60 * p, 20, 1);
+
+        healthBar.transform.localScale = (p != 1) ? AnimMath.Ease(healthBar.transform.localScale, scaleGoal, .001f) : scaleGoal;
         
-        foreach(Image i in bars)
-        {
-            Destroy(i.gameObject);
-        }
-        bars.Clear();
-        for (int i = 0; i < playerRef.health; i++)
-        {
-            Image thing = Instantiate(health, healthBarBase);
-            thing.transform.position += new Vector3(0, i/4f);
-            bars.Add(thing);
-            
-        }
-        //healthBar.GetComponent<RectTransform>().transform. = playerRef.health * 40;
+    }
+
+    void UpdateSpecialMeter()
+    {
+        float p = playerRef.specialMeter / playerRef.maxSpecialMeter;
+
+        float angleZ = AnimMath.Lerp(120, -120, p);
+
+        Quaternion goalRot = Quaternion.Euler(0, 0, angleZ);
+
+        specialMeterNeedle.transform.localRotation = (p!= 0) ? AnimMath.Ease(specialMeterNeedle.transform.localRotation, goalRot, .001f, false) : goalRot;
     }
 }

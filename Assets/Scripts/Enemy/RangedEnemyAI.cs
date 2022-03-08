@@ -40,16 +40,16 @@ public class RangedEnemyAI : MonoBehaviour
         {
             var randAngle = Random.Range(Mathf.PI / 2, Mathf.PI * 1.5f);
             walkTarget = new Vector3(target.position.x + (Mathf.Cos(randAngle) * walkDistance), target.position.y + (Mathf.Sin(randAngle) * walkDistance), 0);
-            transform.localScale = new Vector3(.2f, .2f, 1);
+            transform.localScale = new Vector3(1.5f, 1.5f, 1);
         }
         else
         {
             var randAngle = Random.Range(Mathf.PI * 1.5f, Mathf.PI * 2.5f);
             walkTarget = new Vector3(target.position.x + Mathf.Cos(randAngle) * walkDistance, target.position.y + Mathf.Sin(randAngle) * walkDistance, 0);
-            transform.localScale = new Vector3(-.2f, .2f, 1);
+            transform.localScale = new Vector3(-1.5f, 1.5f, 1);
         }
         UpdatePath();
-        projectileType = (int)Random.Range(1, 5);
+        projectileType = (int)Random.Range(1, 4);
         
     }
 
@@ -65,13 +65,13 @@ public class RangedEnemyAI : MonoBehaviour
         {
             var randAngle = Random.Range(Mathf.PI / 2, Mathf.PI * 1.5f);
             walkTarget = new Vector3(target.position.x + (Mathf.Cos(randAngle) * walkDistance), target.position.y + (Mathf.Sin(randAngle) * walkDistance), 0);
-            transform.localScale = new Vector3(.2f, .2f, 1);
+            transform.localScale = new Vector3(1.5f, 1.5f, 1);
         }
         else
         {
             var randAngle = Random.Range(Mathf.PI * 1.5f, Mathf.PI * 2.5f);
             walkTarget = new Vector3(target.position.x + Mathf.Cos(randAngle) * walkDistance, target.position.y + Mathf.Sin(randAngle) * walkDistance, 0);
-            transform.localScale = new Vector3(-.2f, .2f, 1);
+            transform.localScale = new Vector3(-1.5f, 1.5f, 1);
         }
 
         if (currentWaypoint >= path.vectorPath.Count)

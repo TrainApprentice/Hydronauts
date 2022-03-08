@@ -90,11 +90,25 @@ public class EnemyMain : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        if(health > 0)
+        switch(enemyType)
         {
-            healthBar.transform.localPosition = (transform.localScale.x < 0) ? new Vector3((1 - (health / maxHealth)) * 6f, 18f, 0) : new Vector3((1 - (health / maxHealth)) * -6f, 18f, 0);
-            healthBar.transform.localScale = new Vector3((health / maxHealth) * 12f, 1f, 1);   
+            case 1:
+                if (health > 0)
+                {
+                    healthBar.transform.localPosition = (transform.localScale.x < 0) ? new Vector3((1 - (health / maxHealth)) * 6f, 18f, 0) : new Vector3((1 - (health / maxHealth)) * -6f, 18f, 0);
+                    healthBar.transform.localScale = new Vector3((health / maxHealth) * 12f, 1f, 1);
+                }
+                break;
+            case 2:
+                if (health > 0)
+                {
+                    healthBar.transform.localPosition = (transform.localScale.x < 0) ? new Vector3((1 - (health / maxHealth)) * .875f, 2.5f, 0) : new Vector3((1 - (health / maxHealth)) * -.875f, 2.5f, 0);
+                    healthBar.transform.localScale = new Vector3((health / maxHealth) * 1.75f, .15f, 1);
+                }
+                break;
+
         }
+        
         
     }
 

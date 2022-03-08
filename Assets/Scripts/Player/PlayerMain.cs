@@ -12,10 +12,14 @@ public class PlayerMain : MonoBehaviour
     public PlayerUI ui;
 
     public int health = 10;
+    public int maxHealth = 10;
+    public float specialMeter = 10f;
+    public float maxSpecialMeter = 10f;
     private bool isInvincible = false;
     private float iFrames = 0f;
-    public bool hasSpecial;
-    public string currSpecial;
+    private bool hasSpecial = true;
+    private string currSpecial = "sprinkler";
+    private float specialRechargeRate = .25f;
 
     public CameraFollow cam;
 
@@ -25,11 +29,18 @@ public class PlayerMain : MonoBehaviour
     
     public SpriteRenderer sprite;
 
+    public GameObject sprinklerAttack, blastAttack;
+    private float specialDuration = 0f;
+    private bool canMove = true;
+    private bool isRunning = false;
+    public bool isDead = false;
+
     Vector2 movement;
 
     private int playerState, animState;
     private bool canAttack = true;
     private bool isWalking = false;
+    
 
     private float landingY;
     private bool setLanding = false;
@@ -54,19 +65,51 @@ public class PlayerMain : MonoBehaviour
     {
         shadow = transform.Find("Shadow").gameObject;
 
-        cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();  
+        cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();
+        // If there's a save, load those stats
+        // Otherwise, reset to default values
+
+        Reset();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //print(animResetTimer);
-        movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical") * .75f;
+        if (canMove)
+        {
+            movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical") * .75f;
+        }
+        else movement = Vector2.zero;
 
-        //print(comboTimer);
+        if (specialDuration > 0)
+        {
+            canAttack = false;
+            if (specialDuration - Time.deltaTime == 0) specialDuration -= Time.deltaTime * 1.1f;
+            else specialDuration -= Time.deltaTime;
 
-        if(movement != Vector2.zero && !isWalking)
+        }
+        else if(specialDuration < 0)
+        { 
+            specialDuration = 0;
+            canAttack = true;
+            if (currSpecial == "blast") canMove = true;
+            if (currSpecial == "sprinkler") moveSpeed = 5f;
+        }
+
+        isRunning = Input.GetKey("left shift");
+        if (isRunning) moveSpeed = 10f;
+        else if (specialDuration == 0) moveSpeed = 5f;
+
+        if (hasSpecial)
+        {
+            if (specialMeter < maxSpecialMeter) specialMeter += Time.deltaTime * specialRechargeRate;
+            else specialMeter = maxSpecialMeter;
+        }
+        else specialMeter = 0;
+        
+
+        if(movement != Vector2.zero && !isWalking && specialDuration <= 0)
         {
             AnimUpdate("walking");
             isWalking = true;
@@ -95,15 +138,11 @@ public class PlayerMain : MonoBehaviour
             playerState = JUMP_STATE;
             
         }
-        if(Input.GetKeyDown("f"))
+        if(Input.GetKeyDown("q"))
         {
-            cam.GetComponent<CameraFollow>().SwapFreeze(false);
+            ActivateSpecial();
         }
-        if(Input.GetKeyDown("l"))
-        {
-            ApplyDamage(3);
-            //print("Bing");
-        }
+        
         if (playerState == JUMP_STATE)
         {
             if (!setLanding)
@@ -146,7 +185,31 @@ public class PlayerMain : MonoBehaviour
             isInvincible = false;
         }
 
+        // DEBUG ONLY
+        if (Input.GetKeyDown("f"))
+        {
+            cam.GetComponent<CameraFollow>().SwapFreeze(false);
+        }
+        if (Input.GetKeyDown("l"))
+        {
+            ApplyDamage(5);
+            //print("Bing");
+        }
+        if (Input.GetKeyDown("b"))
+        {
+            currSpecial = "blast";
+            specialMeter = maxSpecialMeter;
+        }
+        if (Input.GetKeyDown("r"))
+        {
+            currSpecial = "sprinkler";
+            specialMeter = maxSpecialMeter;
+        }
+
+        if (health <= 0) isDead = true;
+
     }
+
     private void FixedUpdate()
     {
         
@@ -155,23 +218,11 @@ public class PlayerMain : MonoBehaviour
         if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
         
     }
-
-    public void ApplyDamage(int damage)
-    {
-        if(!isInvincible)
-        {
-            health -= damage;
-            isInvincible = true;
-            iFrames = 2;
-        }
-        ui.UpdateHealth();
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Encounter")
+        if (collision.gameObject.tag == "Encounter")
         {
-            switch(collision.gameObject.name)
+            switch (collision.gameObject.name)
             {
                 case "Encounter1":
                     GameManager.instance.StartEncounter(1);
@@ -186,10 +237,23 @@ public class PlayerMain : MonoBehaviour
                     GameManager.instance.StartEncounter(4);
                     break;
             }
-            collision.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            collision.gameObject.SetActive(false);
         }
-        
+
     }
+
+    public void ApplyDamage(int damage)
+    {
+        if(!isInvincible)
+        {
+            health -= damage;
+            isInvincible = true;
+            iFrames = 2;
+        }
+        ui.UpdateHealth();
+    }
+
+    
     private void StateMachine()
     {
         switch(playerState)
@@ -304,6 +368,41 @@ public class PlayerMain : MonoBehaviour
         
         
         
+    }
+    public void Reset()
+    {
+        health = maxHealth;
+        isDead = false;
+        //hasSpecial = false;
+        //specialDuration = 0;
+        //specialMeter = 0;
+    }
+
+    private void ActivateSpecial()
+    {
+        if(hasSpecial && specialMeter == maxSpecialMeter)
+        {
+            switch(currSpecial)
+            {
+                case "blast":
+                    specialMeter -= 8f;
+                    specialDuration = 1f;
+                    GameObject newBlast = Instantiate(blastAttack, transform.position, Quaternion.identity);
+                    if (transform.localScale.x < 0) newBlast.GetComponent<Blast>().flipDirection = true;
+                    canMove = false;
+                    break;
+                case "sprinkler":
+                    specialMeter -= 6f;
+                    specialDuration = 2f;
+                    Instantiate(sprinklerAttack, transform.position, Quaternion.identity);
+                    moveSpeed = 2f;
+                    break;
+                default:
+                    print("Can't use that!");
+                    break;
+
+            }
+        }
     }
 
     private void AnimUpdate(string varUpdate, bool setVal = true)

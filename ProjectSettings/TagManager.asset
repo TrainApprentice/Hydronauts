@@ -7,6 +7,11 @@ TagManager:
   - Enemy
   - Encounter
   - Wall
+  - SaveSlots
+  - MenuWarning
+  - QuitWarning
+  - ConfirmOverwrite
+  - PauseMenu
   layers:
   - Default
   - TransparentFX
@@ -17,7 +22,7 @@ TagManager:
   - Building
   - Invisible Walls
   - Fist
-  - 
+  - Special
   - 
   - 
   - 

@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 8284502844303408883}
   - component: {fileID: 1509528238752395386}
   - component: {fileID: 7345437734972507014}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -205,6 +205,7 @@ GameObject:
   - component: {fileID: 3546871086593666562}
   - component: {fileID: -9038818831028711314}
   - component: {fileID: 8494680217782790227}
+  - component: {fileID: -6150080936872541973}
   m_Layer: 0
   m_Name: MeleeEnemy
   m_TagString: Enemy
@@ -271,7 +272,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e748aa2cab159ee4d94c9dc816ca7bdf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 47fd0a01b971e4b47b6b7e0c564a67da, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -361,8 +362,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags: -1
-  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  traversableTags: -3
+  tagPenalties: 000000000a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
 --- !u!114 &8494680217782790227
@@ -381,6 +382,27 @@ MonoBehaviour:
   master: {fileID: 2809625713432865593}
   target: {fileID: 0}
   isAttacking: 0
+--- !u!50 &-6150080936872541973
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5979118262283460890}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 7
 --- !u!1 &7517662508267426141
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +497,7 @@ GameObject:
   - component: {fileID: 4025853600975838165}
   - component: {fileID: 6687786938519136052}
   - component: {fileID: 72321877037139630}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}

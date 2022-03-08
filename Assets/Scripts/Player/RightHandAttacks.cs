@@ -12,42 +12,7 @@ public class RightHandAttacks : MonoBehaviour
     private GameObject currComic;
 
     private float damage = 5f;
-    // Attack Functions
-    public void BasicAttack() 
-    {
-        
-    }
-
-    public void Slam()
-    {
-
-    }
-
-    public void Stunner()
-    {
-
-    }
-
-    public void AirStrike()
-    {
-
-    }
-
-    public void SpinAttack()
-    {
-
-    }
-
-    // Functions for Animations
-    public void ActivateHitbox()
-    {
-        hitbox.enabled = true;
-    }
-
-    public void DeactivateHitbox()
-    {
-        hitbox.enabled = false;
-    }
+   
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
@@ -58,7 +23,7 @@ public class RightHandAttacks : MonoBehaviour
         }
     }
 
-    private void SpawnComic(Vector3 enemyPos)
+    private void SpawnComic(Vector2 enemyPos)
     {
         var dir = (master.transform.localScale.x < 0) ? "right" : "left";
 

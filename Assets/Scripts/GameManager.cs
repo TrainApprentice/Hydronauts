@@ -1,7 +1,9 @@
 //using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class GameManager : MonoBehaviour
     private Camera cam;
     private GameObject lWall, rWall;
     public GameObject pauseMenu;
+    private PlayerMain player;
 
     private GameObject baseMeleeEnemy, baseRangedEnemy, baseWall;
     private List<EnemyMain> enemies = new List<EnemyMain>();
@@ -32,18 +35,25 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
-        baseMeleeEnemy = Resources.Load<GameObject>("Prefab/MeleeEnemy");
-        baseRangedEnemy = Resources.Load<GameObject>("Prefab/RangedEnemy");
-        baseWall = Resources.Load<GameObject>("Prefab/Wall");
+        //FindElements();
     }
+    
     private void Update()
     {
+        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1") && !player) ResetGameStats();
         if (Input.GetKeyDown("p"))
         {
             if (Time.timeScale == 0) ResumeGame();
             else PauseGame();
         }
+        if (player.isDead && SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1"))
+        {
+            GoToGameOver();
+            player.Reset();
+            
+        }
+
+
     }
 
     private void FixedUpdate()
@@ -55,13 +65,13 @@ public class GameManager : MonoBehaviour
             if (enemySpawnCooldown > 0) enemySpawnCooldown -= Time.fixedDeltaTime;
             else
             {
-                var randSpawn = new Vector3(Random.Range(lWall.transform.position.x + 1f, rWall.transform.position.x - 1f), Random.Range(lWall.transform.position.y + 3f, lWall.transform.position.y - 2f), 0f);
+                var randSpawn = new Vector3(UnityEngine.Random.Range(lWall.transform.position.x + 1f, rWall.transform.position.x - 1f), UnityEngine.Random.Range(lWall.transform.position.y + 3f, lWall.transform.position.y - 2f), 0f);
                 GameObject newEnemy;
 
                 switch(currEncounter)
                 {
                     case 1:
-                        newEnemy = Instantiate(baseRangedEnemy, randSpawn, Quaternion.identity);
+                        newEnemy = Instantiate(baseMeleeEnemy, randSpawn, Quaternion.identity);
                         enemies.Add(newEnemy.GetComponent<EnemyMain>());
                         break;
                     case 2:
@@ -96,6 +106,10 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         pauseMenu.SetActive(false);
     }
+    private void GoToGameOver()
+    {
+        SceneManager.LoadScene("GameOver");
+    }
     private void UpdateEnemies()
     {
         for(int i = 0; i < enemies.Count; i++)
@@ -116,7 +130,7 @@ public class GameManager : MonoBehaviour
         switch(num)
         {
             case 1:
-                killGoal = 1;
+                killGoal = 5;
                 break;
             case 2:
                 killGoal = 10;
@@ -146,17 +160,29 @@ public class GameManager : MonoBehaviour
         cam.GetComponent<CameraFollow>().SwapFreeze(false);
     }
 
+    public void ResetGameStats()
+    {
+        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        baseMeleeEnemy = Resources.Load<GameObject>("Prefab/MeleeEnemy");
+        baseRangedEnemy = Resources.Load<GameObject>("Prefab/RangedEnemy");
+        baseWall = Resources.Load<GameObject>("Prefab/Wall");
+        player = FindObjectOfType<PlayerMain>();
+
+        pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
+        GetComponent<PauseMenu>().FindMenuElements();
+    }
+
     private void SetWalls(int num)
     {
         switch(num)
         {
             case 1:
-                lWall = Instantiate(baseWall, new Vector3(-4f, -4.3f, 0f), Quaternion.identity);
-                rWall = Instantiate(baseWall, new Vector3(13f, -4.3f, 0f), Quaternion.identity);
+                lWall = Instantiate(baseWall, new Vector3(-4f, -2f, 0f), Quaternion.identity);
+                rWall = Instantiate(baseWall, new Vector3(13f, -2f, 0f), Quaternion.identity);
                 break;
             case 2:
-                lWall = Instantiate(baseWall, new Vector3(15.5f, -4.3f, 0f), Quaternion.identity);
-                rWall = Instantiate(baseWall, new Vector3(33f, -4.3f, 0f), Quaternion.identity);
+                lWall = Instantiate(baseWall, new Vector3(15.5f, -2f, 0f), Quaternion.identity);
+                rWall = Instantiate(baseWall, new Vector3(33f, -2f, 0f), Quaternion.identity);
                 break;
             case 3:
                 lWall = Instantiate(baseWall, new Vector3(47f, -12f, 0f), Quaternion.identity);
