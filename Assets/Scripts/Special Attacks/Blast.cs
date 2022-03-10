@@ -26,10 +26,13 @@ public class Blast : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        print("Bing");
         if(collision.gameObject.CompareTag("Enemy"))
         {
             collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
+        }
+        if (collision.CompareTag("Fire"))
+        {
+            collision.GetComponent<FireObstacle>().ApplyDamage(5);
         }
     }
 }

@@ -1,9 +1,8 @@
-//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RightHandAttacks : MonoBehaviour
+public class FistBehavior : MonoBehaviour
 {
     public Collider2D hitbox;
     public GameObject master;
@@ -11,20 +10,23 @@ public class RightHandAttacks : MonoBehaviour
     public GameObject comicEffect;
     private GameObject currComic;
 
-    private float damage = 5f;
-   
+    public float damage = 5f;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
             if (currComic == null) SpawnComic(collision.gameObject.transform.position);
-            
-            collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damage);
+
+            collision.GetComponent<EnemyMain>().ApplyDamage(damage);
         }
+    }
 
-        if(collision.CompareTag("Obstacle"))
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
         {
-
+            collision.gameObject.GetComponent<DebrisObstacle>().ApplyDamage(Mathf.Floor(damage / 2));
         }
     }
 
@@ -39,5 +41,3 @@ public class RightHandAttacks : MonoBehaviour
         currComic = Instantiate(comicEffect, new Vector3(enemyPos.x + Mathf.Cos(rand) * 4, enemyPos.y + Mathf.Sin(rand) * 4, 0), Quaternion.identity);
     }
 }
-
-

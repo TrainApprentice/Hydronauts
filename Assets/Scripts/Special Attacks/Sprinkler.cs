@@ -48,10 +48,14 @@ public class Sprinkler : MonoBehaviour
         {
             collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
         }
+        if(collision.CompareTag("Fire"))
+        {
+            collision.GetComponent<FireObstacle>().ApplyDamage(1);
+        }
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        print("Bing2");
+        
         if (collision.gameObject.CompareTag("Enemy"))
         {
             collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damageAmt);

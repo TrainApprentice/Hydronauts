@@ -7,40 +7,41 @@ using UnityEngine;
 public class PlayerMain : MonoBehaviour
 {
     public Animator masterAnim;
-    private float animResetTimer = 0f;
+    
 
     public PlayerUI ui;
+    public CameraFollow cam;
+    public Rigidbody2D rb;
+    public SpriteRenderer sprite;
+    public GameObject sprinklerAttack, blastAttack, dousingBox;
 
     public int health = 10;
     public int maxHealth = 10;
     public float specialMeter = 10f;
     public float maxSpecialMeter = 10f;
+    public bool isDead = false;
+
     private bool isInvincible = false;
     private float iFrames = 0f;
     private bool hasSpecial = true;
     private string currSpecial = "sprinkler";
     private float specialRechargeRate = .25f;
 
-    public CameraFollow cam;
+    private float animResetTimer = 0f;
 
     private float moveSpeed = 5f;
     private float jumpForce = 5000f;
-    public Rigidbody2D rb;
     
-    public SpriteRenderer sprite;
-
-    public GameObject sprinklerAttack, blastAttack;
     private float specialDuration = 0f;
     private bool canMove = true;
     private bool isRunning = false;
-    public bool isDead = false;
+    private bool isDousing = false;
 
     Vector2 movement;
 
     private int playerState, animState;
     private bool canAttack = true;
     private bool isWalking = false;
-    
 
     private float landingY;
     private bool setLanding = false;
@@ -53,6 +54,7 @@ public class PlayerMain : MonoBehaviour
     private float attackCooldown = .1f;
 
     private GameObject shadow;
+    private GameObject currDouse;
     private const int IDLE_STATE = 0;
     private const int WALK_STATE = 1;
     private const int ATTACK_STATE = 2;
@@ -75,16 +77,13 @@ public class PlayerMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (canMove)
-        {
-            movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical") * .75f;
-        }
-        else movement = Vector2.zero;
+        RunDousing();
+        
 
         if (specialDuration > 0)
         {
             canAttack = false;
+            if (currSpecial == "blast") canMove = false;
             if (specialDuration - Time.deltaTime == 0) specialDuration -= Time.deltaTime * 1.1f;
             else specialDuration -= Time.deltaTime;
 
@@ -96,6 +95,7 @@ public class PlayerMain : MonoBehaviour
             if (currSpecial == "blast") canMove = true;
             if (currSpecial == "sprinkler") moveSpeed = 5f;
         }
+        
 
         isRunning = Input.GetKey("left shift");
         if (isRunning) moveSpeed = 10f;
@@ -107,9 +107,16 @@ public class PlayerMain : MonoBehaviour
             else specialMeter = maxSpecialMeter;
         }
         else specialMeter = 0;
-        
 
-        if(movement != Vector2.zero && !isWalking && specialDuration <= 0)
+        if (canMove)
+        {
+            movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical") * .75f;
+        }
+        else movement = Vector2.zero;
+
+
+        if (movement != Vector2.zero && !isWalking && specialDuration <= 0)
         {
             AnimUpdate("walking");
             isWalking = true;
@@ -142,7 +149,10 @@ public class PlayerMain : MonoBehaviour
         {
             ActivateSpecial();
         }
-        
+        isDousing = Input.GetKey("r");
+
+        /*
+
         if (playerState == JUMP_STATE)
         {
             if (!setLanding)
@@ -169,9 +179,11 @@ public class PlayerMain : MonoBehaviour
                 setLanding = false;
             }
         }
+        */
 
         AttackInputs();
         StateMachine();
+        
 
         if (iFrames > 0)
         {
@@ -210,10 +222,12 @@ public class PlayerMain : MonoBehaviour
 
     }
 
+    
+
     private void FixedUpdate()
     {
-        
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
+      
         if (Input.GetAxisRaw("Horizontal") < 0) transform.localScale = new Vector3(-1f, 1f, 1);
         if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
         
@@ -240,6 +254,33 @@ public class PlayerMain : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
 
+        if(collision.CompareTag("Fire"))
+        {
+            ApplyDamage(Mathf.FloorToInt(collision.GetComponent<FireObstacle>().size));
+        }
+
+    }
+
+    private void RunDousing()
+    {
+        if (isDousing)
+        {
+            if (!currDouse)
+            {
+                float offset = transform.localScale.x;
+                currDouse = Instantiate(dousingBox, new Vector3(transform.position.x + offset, transform.position.y - .5f), Quaternion.identity);
+                currDouse.transform.localScale = transform.localScale;
+            }
+            canMove = false;
+            canAttack = false;
+        }
+        else
+        {
+            canMove = true;
+            canAttack = true;
+            Destroy(currDouse);
+        }
+        
     }
 
     public void ApplyDamage(int damage)
@@ -250,7 +291,6 @@ public class PlayerMain : MonoBehaviour
             isInvincible = true;
             iFrames = 2;
         }
-        ui.UpdateHealth();
     }
 
     
