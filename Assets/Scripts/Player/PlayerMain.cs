@@ -200,7 +200,7 @@ public class PlayerMain : MonoBehaviour
         // DEBUG ONLY
         if (Input.GetKeyDown("f"))
         {
-            cam.GetComponent<CameraFollow>().SwapFreeze(false);
+            cam.GetComponent<CameraFollow>().SwapFreeze(0);
         }
         if (Input.GetKeyDown("l"))
         {
@@ -256,7 +256,8 @@ public class PlayerMain : MonoBehaviour
 
         if(collision.CompareTag("Fire"))
         {
-            ApplyDamage(Mathf.FloorToInt(collision.GetComponent<FireObstacle>().size));
+            if(collision.GetComponent<FireObstacle>()) ApplyDamage(collision.GetComponent<FireObstacle>().damage);
+            if (collision.GetComponent<FireProjectile>()) ApplyDamage(collision.GetComponent<FireProjectile>().damage);
         }
 
     }
@@ -327,6 +328,7 @@ public class PlayerMain : MonoBehaviour
         {
             comboTimer = 0;
             comboSequence.Clear();
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
         if(!canAttack)
         {
@@ -351,6 +353,7 @@ public class PlayerMain : MonoBehaviour
                 attackCooldown = .2f;
             }
             CheckCombos("light");
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
         }
 
@@ -372,6 +375,7 @@ public class PlayerMain : MonoBehaviour
                 attackCooldown = .2f;
             }
             CheckCombos("heavy");
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
 
@@ -382,7 +386,6 @@ public class PlayerMain : MonoBehaviour
         if (CompareIntArrays(tempArray, uppercutCombo))
         {
             AnimUpdate("upperCut");
-            //Clear combos at end of sequence
         }
         else if(CompareIntArrays(tempArray, slamCombo))
         {

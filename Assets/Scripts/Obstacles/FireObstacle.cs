@@ -6,10 +6,12 @@ public class FireObstacle : MonoBehaviour
 {
     float currHealth;
     float maxHealth;
-    public float size;
+    float size;
+    public int damage;
     void Start()
     {
         size = Random.Range(2, 4);
+        damage = Mathf.FloorToInt(size);
 
         maxHealth = size;
         currHealth = maxHealth;

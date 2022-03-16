@@ -57,15 +57,23 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
-    public void SwapFreeze(bool setCenter)
+    public void SwapFreeze(int currEncounter)
     {
 
-        if (!isFrozen)
+        if (!isFrozen && currEncounter > 0)
         {
-            if (setCenter)
+            if (currEncounter <= 2)
             {
                 setPosition.y = -3f;
                 transform.position = setPosition;
+            }
+            if(currEncounter == 3)
+            {
+
+            }
+            if(currEncounter == 4)
+            {
+
             }
             isFrozen = true;
         }

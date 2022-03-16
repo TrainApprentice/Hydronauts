@@ -26,7 +26,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateHealth()
     {
         float p = (float)playerRef.health / playerRef.maxHealth;
-        Vector3 scaleGoal = new Vector3(60 * p, 20, 1);
+        Vector3 scaleGoal = new Vector3(33 * p, 10, 1);
 
         healthBar.transform.localScale = (p != 1) ? AnimMath.Ease(healthBar.transform.localScale, scaleGoal, .001f) : scaleGoal;
         

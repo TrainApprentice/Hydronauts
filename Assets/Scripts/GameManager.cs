@@ -9,16 +9,19 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public GameObject pauseMenu;
+    public Transform bossSpawn;
+    public int killCount = 0;
+
     private Camera cam;
     private GameObject lWall, rWall;
-    public GameObject pauseMenu;
     private PlayerMain player;
-
-    private GameObject baseMeleeEnemy, baseRangedEnemy, baseWall;
+    private GameObject baseMeleeEnemy, baseRangedEnemy, baseBoss, baseWall;
+    private BossAI currBoss;
+    
     private List<EnemyMain> enemies = new List<EnemyMain>();
     private bool inEncounter = false;
     private int currEncounter = 0;
-    public int killCount = 0;
     private int killGoal = 0;
     private int currEnemies = 0;
     private float enemySpawnCooldown = .3f;
@@ -35,7 +38,6 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        //FindElements();
     }
     
     private void Update()
@@ -81,6 +83,11 @@ public class GameManager : MonoBehaviour
                     case 3:
                         newEnemy = (currEnemies % 2 == 0) ? Instantiate(baseRangedEnemy, randSpawn, Quaternion.identity) : Instantiate(baseMeleeEnemy, randSpawn, Quaternion.identity);
                         enemies.Add(newEnemy.GetComponent<EnemyMain>());
+                        break;
+
+                    case 4:
+                        newEnemy = Instantiate(baseBoss, bossSpawn.position, Quaternion.identity);
+                        currBoss = newEnemy.GetComponent<BossAI>();
                         break;
                 }
 
@@ -143,8 +150,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
         SetWalls(num);
-        var test = (num <= 2);
-        cam.GetComponent<CameraFollow>().SwapFreeze(test);
+        cam.GetComponent<CameraFollow>().SwapFreeze(num);
         inEncounter = true;
     }
 
@@ -157,7 +163,7 @@ public class GameManager : MonoBehaviour
         inEncounter = false;
         Destroy(rWall);
         Destroy(lWall);
-        cam.GetComponent<CameraFollow>().SwapFreeze(false);
+        cam.GetComponent<CameraFollow>().SwapFreeze(0);
     }
 
     public void ResetGameStats()
@@ -165,6 +171,7 @@ public class GameManager : MonoBehaviour
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         baseMeleeEnemy = Resources.Load<GameObject>("Prefab/MeleeEnemy");
         baseRangedEnemy = Resources.Load<GameObject>("Prefab/RangedEnemy");
+        baseBoss = Resources.Load<GameObject>("Prefab/Boss");
         baseWall = Resources.Load<GameObject>("Prefab/Wall");
         player = FindObjectOfType<PlayerMain>();
 

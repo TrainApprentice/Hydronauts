@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2864304324480814121}
   - component: {fileID: 8749370091757071388}
   m_Layer: 0
-  m_Name: fire
+  m_Name: FireObstacle
   m_TagString: Fire
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -144,4 +144,4 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 7
