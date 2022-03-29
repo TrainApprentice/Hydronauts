@@ -7,12 +7,16 @@ public class BossAI : MonoBehaviour
     public GameObject fireProj;
     public Transform fireSpawnLeft, fireSpawnRight;
     public Transform playerRef;
+    
+    private Transform[] fireAttackPositions = new Transform[3];
+
+    public bool isAttackingFire = false;
+    public bool isAttackingSlam = false;
+    public bool isAttackingRush = false;
+    public bool isAttackingShockwave = false;
 
     private BossMovement mover;
-    private bool isAttackingFire = false;
-    private bool isAttackingSlam = false;
-    private bool isAttackingRush = false;
-    private bool isAttackingShockwave = false;
+    private Transform shockwavePos;
     private int currPhase = 1;
     private int flamePattern = 1;
     private float fireAttackTimer = 2f;
@@ -22,6 +26,10 @@ public class BossAI : MonoBehaviour
     {
         playerRef = FindObjectOfType<PlayerMain>().transform;
         mover = GetComponent<BossMovement>();
+        shockwavePos = FindObjectOfType<ShockwaveID>().transform;
+        fireAttackPositions[0] = FindObjectOfType<BottomFire>().transform;
+        fireAttackPositions[1] = FindObjectOfType<TopFire>().transform;
+        fireAttackPositions[2] = FindObjectOfType<MidFire>().transform;
     }
 
     // Update is called once per frame
@@ -29,12 +37,24 @@ public class BossAI : MonoBehaviour
     {
         if(Input.GetKeyDown("k") && !isAttackingFire)
         {
-            isAttackingFire = true;
+            FlamethrowerAttack();
+            
             fireAttackTimer = 2f;
         }
         if(Input.GetKeyDown("o") && !isAttackingSlam)
         {
-             SlamAttack();
+            SlamAttack();
+            isAttackingSlam = true;
+        }
+        if(Input.GetKeyDown("u") && !isAttackingShockwave)
+        {
+            ShockwaveAttack();
+            isAttackingShockwave = true;
+        }
+        if(Input.GetKeyDown("y") && !isAttackingRush)
+        {
+            RushAttack();
+            isAttackingRush = true;
         }
 
         if (isAttackingFire) FlamethrowerAttack(flamePattern);
@@ -51,13 +71,13 @@ public class BossAI : MonoBehaviour
             {
                 GameObject newFire = Instantiate(fireProj, fireSpawnLeft.position, Quaternion.identity);
                 newFire.GetComponent<FireProjectile>().angle = (fireAttackTimer < 1) ? 30f - ((1 - fireAttackTimer) * 30f) : 30f;
-                //print("1 " + newFire.GetComponent<FireProjectile>().angle);
+                
             }
             else if (choosePattern == 2)
             {
                 GameObject newFire = Instantiate(fireProj, fireSpawnRight.position, Quaternion.identity);
                 newFire.GetComponent<FireProjectile>().angle = (fireAttackTimer < 1) ? -30f + ((1 - fireAttackTimer) * 30f): -30f;
-                //print("2 " + newFire.GetComponent<FireProjectile>().angle);
+                
             }
             else
             {
@@ -66,22 +86,34 @@ public class BossAI : MonoBehaviour
                 GameObject newFire2 = Instantiate(fireProj, fireSpawnRight.position, Quaternion.identity);
                 newFire2.GetComponent<FireProjectile>().angle = -30f;
             }
-            print(choosePattern);
+            
             timeBetweenFlames = .05f;
         }
-        if (fireAttackTimer <= 0)
+        if (fireAttackTimer <= 0 && isAttackingFire)
         {
             isAttackingFire = false;
             if (flamePattern < 3) flamePattern++;
             else flamePattern = 1;
-
+            print(flamePattern);
             timeBetweenFlames = 0;
         }
         
     }
-
+    public void FlamethrowerAttack()
+    {
+        mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, flamePattern + 5);
+    }
     public void SlamAttack()
     {
-        mover.SetNewLocation(playerRef.position - new Vector3(3f, -1f, 0), 1);
+        mover.SetNewLocation(playerRef.position - new Vector3(3f, -2.5f, 0), 1);
+    }
+
+    public void ShockwaveAttack() 
+    {
+        mover.SetNewLocation(shockwavePos.position, 2);
+    }
+    public void RushAttack()
+    {
+        mover.BeginRush();
     }
 }
