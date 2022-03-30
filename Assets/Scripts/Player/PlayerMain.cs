@@ -7,7 +7,6 @@ using UnityEngine;
 public class PlayerMain : MonoBehaviour
 {
     public Animator masterAnim;
-    
 
     public PlayerUI ui;
     public CameraFollow cam;
@@ -28,14 +27,17 @@ public class PlayerMain : MonoBehaviour
     private float specialRechargeRate = .25f;
 
     private float animResetTimer = 0f;
+    private float perfectBlockTimer = 0;
 
     private float moveSpeed = 5f;
     private float jumpForce = 5000f;
     
     private float specialDuration = 0f;
     private bool canMove = true;
+    private bool canBlock = true;
     private bool isRunning = false;
     private bool isDousing = false;
+    private bool isBlocking = false;
 
     Vector2 movement;
 
@@ -83,6 +85,7 @@ public class PlayerMain : MonoBehaviour
         if (specialDuration > 0)
         {
             canAttack = false;
+            canBlock = false;
             if (currSpecial == "blast") canMove = false;
             if (specialDuration - Time.deltaTime == 0) specialDuration -= Time.deltaTime * 1.1f;
             else specialDuration -= Time.deltaTime;
@@ -92,6 +95,7 @@ public class PlayerMain : MonoBehaviour
         { 
             specialDuration = 0;
             canAttack = true;
+            canBlock = true;
             if (currSpecial == "blast") canMove = true;
             if (currSpecial == "sprinkler") moveSpeed = 5f;
         }
@@ -126,7 +130,7 @@ public class PlayerMain : MonoBehaviour
             isWalking = false;
             AnimUpdate("walking", false);
         }
-        
+
         if (animResetTimer > 0) animResetTimer -= Time.deltaTime;
         else
         {
@@ -138,19 +142,31 @@ public class PlayerMain : MonoBehaviour
             AnimUpdate("longHit", false);
 
         }
-
-        if (Input.GetButtonDown("Jump"))
-        {
-            // Figure out Jump physics
-            playerState = JUMP_STATE;
-            
-        }
         if(Input.GetKeyDown("q"))
         {
             ActivateSpecial();
         }
         isDousing = Input.GetKey("r");
-
+        isBlocking = Input.GetKey("left ctrl") && canBlock;
+        if (isBlocking)
+        {
+            canMove = false;
+            canAttack = false;
+        }
+        else
+        {
+            canAttack = true;
+            canMove = true;
+        }
+        if (Input.GetKeyDown("left ctrl"))
+        {
+            perfectBlockTimer = .2f;
+        }
+        if (isBlocking && perfectBlockTimer > 0)
+        {
+            perfectBlockTimer -= Time.deltaTime;
+        }
+        else perfectBlockTimer = 0;
         /*
 
         if (playerState == JUMP_STATE)
@@ -182,7 +198,7 @@ public class PlayerMain : MonoBehaviour
         */
 
         AttackInputs();
-        StateMachine();
+        //StateMachine();
         
 
         if (iFrames > 0)
@@ -196,6 +212,12 @@ public class PlayerMain : MonoBehaviour
             iFrames = 0;
             isInvincible = false;
         }
+
+        if(isBlocking)
+        {
+            sprite.color = new Color(.8f, .8f, .8f);
+        }
+        else sprite.color = new Color(1, 1, 1);
 
         // DEBUG ONLY
         if (Input.GetKeyDown("f"))
@@ -277,8 +299,8 @@ public class PlayerMain : MonoBehaviour
         }
         else
         {
-            canMove = true;
-            canAttack = true;
+            canMove = !isBlocking;
+            canAttack = !isBlocking;
             Destroy(currDouse);
         }
         
@@ -286,9 +308,9 @@ public class PlayerMain : MonoBehaviour
 
     public void ApplyDamage(int damage)
     {
-        if(!isInvincible)
+        if(!isInvincible && perfectBlockTimer == 0)
         {
-            health -= damage;
+            health -= (isBlocking) ? damage/2 : damage;
             isInvincible = true;
             iFrames = 2;
         }
@@ -324,7 +346,7 @@ public class PlayerMain : MonoBehaviour
     private void AttackInputs()
     {
         if (comboTimer > 0) comboTimer -= Time.deltaTime;
-        if(comboTimer < 0)
+        if(comboTimer < 0 || comboSequence.Count > 6)
         {
             comboTimer = 0;
             comboSequence.Clear();
@@ -333,7 +355,7 @@ public class PlayerMain : MonoBehaviour
         if(!canAttack)
         {
             attackCooldown -= Time.deltaTime;
-            if(attackCooldown <= 0) canAttack = true;
+            if(attackCooldown <= 0) canAttack = !isBlocking;
         }
         if(Input.GetButtonDown("Fire1") && canAttack)
         {

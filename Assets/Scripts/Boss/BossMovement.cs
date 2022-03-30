@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BossMovement : MonoBehaviour
 {
+    public Transform leftShoulder, rightShoulder, leftHip, rightHip, leftElbow, rightElbow, leftKnee, rightKnee, baseSkeleton, baseBody;
+    private float animIdleTimer = 0;
+    private float animWalkTimer = 0;
 
     private float walkTimer = 0f;
     private float timeBetweenMovements = 2f;
@@ -47,7 +50,7 @@ public class BossMovement : MonoBehaviour
         }
         transform.position = currLocation;
 
-        if(walkTimer == 1)
+        if(walkTimer == 1 || walkTimer == 0)
         {
             if (doingSlam) AnimSlam();
             else if (doingShockwave) AnimShockwave();
@@ -55,6 +58,8 @@ public class BossMovement : MonoBehaviour
             else AnimIdle();
         }
         if (doingRush) AnimRush();
+
+        if (walkTimer != 0 && walkTimer != 1) AnimWalk();
     }
 
     public void SetNewLocation(Vector3 newPos, int attackType = 0, bool resetWalk = true)
@@ -167,6 +172,35 @@ public class BossMovement : MonoBehaviour
     }
 
     private void AnimIdle()
+    {
+        animIdleTimer += Time.deltaTime;
+        float wave = Mathf.Sin(animIdleTimer);
+
+        float elbowWave = wave * 5;
+
+        leftElbow.localRotation = Quaternion.Euler(0, 0, elbowWave);
+        rightElbow.localRotation = Quaternion.Euler(0, 0, elbowWave + 15);
+
+        float hipWavePos = wave * .15f - .15f;
+        float hipWaveRot = wave * 10;
+
+        rightHip.localPosition = new Vector3(-1.61f, hipWavePos - 1);
+        rightHip.localRotation = Quaternion.Euler(0, 0, hipWaveRot - 30);
+
+        leftHip.localPosition = new Vector3(.77f, hipWavePos - 1.45f);
+        leftHip.localRotation = Quaternion.Euler(0, 0, hipWaveRot - 15f);
+
+        float kneeWave = wave * -15f;
+
+        rightKnee.localRotation = Quaternion.Euler(0, 0, kneeWave + 20f);
+        leftKnee.localRotation = Quaternion.Euler(0, 0, kneeWave - 10);
+
+        float bodyWave = wave * -.2f;
+        baseSkeleton.localPosition = new Vector3(0, bodyWave, 0);
+        baseBody.localPosition = new Vector3(0, bodyWave / 2, 0);
+    }
+
+    private void AnimWalk()
     {
 
     }

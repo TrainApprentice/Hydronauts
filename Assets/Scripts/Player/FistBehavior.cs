@@ -10,7 +10,7 @@ public class FistBehavior : MonoBehaviour
     public GameObject comicEffect;
     private GameObject currComic;
 
-    public float damage = 5f;
+    public int damage = 5;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -19,6 +19,11 @@ public class FistBehavior : MonoBehaviour
             if (currComic == null) SpawnComic(collision.gameObject.transform.position);
 
             collision.GetComponent<EnemyMain>().ApplyDamage(damage);
+        }
+        if(collision.CompareTag("Boss"))
+        {
+            if (currComic == null) SpawnComic(collision.gameObject.transform.position);
+            collision.GetComponentInParent<BossAI>().ApplyDamage(damage);
         }
     }
 

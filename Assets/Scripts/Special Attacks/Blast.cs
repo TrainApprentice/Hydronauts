@@ -26,9 +26,13 @@ public class Blast : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Enemy"))
+        if(collision.CompareTag("Enemy"))
         {
-            collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
+            collision.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
+        }
+        if(collision.CompareTag("Boss"))
+        {
+            collision.GetComponentInParent<BossAI>().ApplyDamage((int)damageAmt);
         }
         if (collision.CompareTag("Fire"))
         {

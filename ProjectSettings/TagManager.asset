@@ -14,6 +14,7 @@ TagManager:
   - PauseMenu
   - Fire
   - Obstacle
+  - Boss
   layers:
   - Default
   - TransparentFX

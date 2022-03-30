@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public Transform bossSpawn;
     public int killCount = 0;
+    public BossUI bossHealthBar;
 
     private Camera cam;
     private GameObject lWall, rWall;
@@ -147,6 +148,7 @@ public class GameManager : MonoBehaviour
                 break;
             case 4:
                 killGoal = 1;
+                bossHealthBar.gameObject.SetActive(true);
                 break;
         }
         SetWalls(num);

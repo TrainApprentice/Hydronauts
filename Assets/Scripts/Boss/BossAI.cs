@@ -9,11 +9,14 @@ public class BossAI : MonoBehaviour
     public Transform playerRef;
     
     private Transform[] fireAttackPositions = new Transform[3];
+    private BossUI healthController;
 
     public bool isAttackingFire = false;
     public bool isAttackingSlam = false;
     public bool isAttackingRush = false;
     public bool isAttackingShockwave = false;
+
+    public int health = 100;
 
     private BossMovement mover;
     private Transform shockwavePos;
@@ -30,6 +33,9 @@ public class BossAI : MonoBehaviour
         fireAttackPositions[0] = FindObjectOfType<BottomFire>().transform;
         fireAttackPositions[1] = FindObjectOfType<TopFire>().transform;
         fireAttackPositions[2] = FindObjectOfType<MidFire>().transform;
+
+        healthController = FindObjectOfType<BossUI>();
+        //healthController.gameObject.SetActive(true);
     }
 
     // Update is called once per frame
@@ -99,6 +105,14 @@ public class BossAI : MonoBehaviour
         }
         
     }
+    public void ApplyDamage(int damage)
+    {
+        health -= damage;
+        healthController.SetCurrentHealth(health);
+
+        if (health <= 0) Destroy(gameObject);
+    }
+
     public void FlamethrowerAttack()
     {
         mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, flamePattern + 5);
