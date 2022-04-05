@@ -20,7 +20,13 @@ public class FireObstacle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currHealth < 0) Destroy(gameObject);
+        if (currHealth < 0)
+        {
+            PlayerMain player = FindObjectOfType<PlayerMain>();
+            player.ApplyDamage(-1);
+            Destroy(gameObject);
+        }
+
         float p = currHealth / maxHealth;
 
         Vector3 smallestSize = new Vector3(size / 8, size / 8, 1);

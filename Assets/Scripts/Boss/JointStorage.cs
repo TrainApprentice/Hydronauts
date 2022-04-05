@@ -49,7 +49,6 @@ public class JointStorage : MonoBehaviour
 
     public void SetNewStart()
     {
-        print("Set!");
         startRot = transform.localRotation;
         startPos = transform.localPosition;
     }

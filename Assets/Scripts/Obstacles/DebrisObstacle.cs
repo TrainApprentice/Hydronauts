@@ -27,12 +27,17 @@ public class DebrisObstacle : MonoBehaviour
         float alpha = currHealth / maxHealth;
         sprite.color = new Color(1, 1, 1, alpha);
 
-        if (currHealth <= 0) Destroy(gameObject);
+        if (currHealth <= 0)
+        {
+            PlayerMain player = FindObjectOfType<PlayerMain>();
+            player.ApplyDamage(-1);
+            Destroy(gameObject);
+        }
     }
 
     public void ApplyDamage(float damage)
     {
         currHealth -= damage;
-        print("CLANK");
+        
     }
 }

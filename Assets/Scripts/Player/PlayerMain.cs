@@ -167,35 +167,6 @@ public class PlayerMain : MonoBehaviour
             perfectBlockTimer -= Time.deltaTime;
         }
         else perfectBlockTimer = 0;
-        /*
-
-        if (playerState == JUMP_STATE)
-        {
-            if (!setLanding)
-            {
-                landingY = rb.position.y;
-                jumpForce = 5000f;
-                gameObject.layer = 2;
-                setLanding = true;
-            }
-            shadow.transform.position = new Vector3(transform.position.x, landingY - 1.8f, 0f);
-            movement.y += jumpForce * Time.deltaTime;
-            jumpForce += Physics2D.gravity.y;
-            if (Input.GetAxisRaw("Vertical") != 0)
-            {
-                landingY += Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
-            }
-
-            if (rb.position.y <= landingY && jumpForce < 0)
-            {
-                playerState = WALK_STATE;
-                rb.position = new Vector2(rb.position.x, landingY);
-                shadow.transform.position = (transform.localScale.x > 0) ? new Vector3(transform.position.x - .28f, transform.position.y - 1.8f, 0f) : new Vector3(transform.position.x + .28f, transform.position.y - 1.8f, 0f);
-                gameObject.layer = 0;
-                setLanding = false;
-            }
-        }
-        */
 
         AttackInputs();
         //StateMachine();
@@ -220,14 +191,10 @@ public class PlayerMain : MonoBehaviour
         else sprite.color = new Color(1, 1, 1);
 
         // DEBUG ONLY
-        if (Input.GetKeyDown("f"))
-        {
-            cam.GetComponent<CameraFollow>().SwapFreeze(0);
-        }
+        
         if (Input.GetKeyDown("l"))
         {
-            ApplyDamage(5);
-            //print("Bing");
+            cam.Shake(.1f, 1);
         }
         if (Input.GetKeyDown("b"))
         {
@@ -308,12 +275,21 @@ public class PlayerMain : MonoBehaviour
 
     public void ApplyDamage(int damage)
     {
-        if(!isInvincible && perfectBlockTimer == 0)
+        if(damage > 0)
         {
-            health -= (isBlocking) ? damage/2 : damage;
-            isInvincible = true;
-            iFrames = 2;
+            if (!isInvincible && perfectBlockTimer == 0)
+            {
+                health -= (isBlocking) ? damage / 2 : damage;
+                isInvincible = true;
+                iFrames = 2;
+            }
         }
+        else
+        {
+            health -= damage;
+            if (health >= maxHealth) health = maxHealth;
+        }
+        
     }
 
     

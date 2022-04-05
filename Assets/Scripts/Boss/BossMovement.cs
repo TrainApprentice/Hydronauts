@@ -5,14 +5,20 @@ using UnityEngine;
 public class BossMovement : MonoBehaviour
 {
     public JointStorage leftShoulder, rightShoulder, leftHip, rightHip, leftElbow, rightElbow, leftKnee, rightKnee, baseSkeleton, baseBody;
+
     private float animIdleTimer = 0;
     private float animWalkTimer = 0;
+
+    private int punchCounter = 0;
+    private bool addPunch = true;
+    private bool doShake = true;
 
     private float walkTimer = 0f;
     private float timeBetweenMovements = 2f;
     private bool slowMovement = false;
     private Transform playerRef;
     private BossAI controller;
+    private CameraFollow cam;
 
     private Vector3 currLocation;
     private Vector3 nextLocation;
@@ -37,6 +43,7 @@ public class BossMovement : MonoBehaviour
         nextLocation = currLocation;
         playerRef = FindObjectOfType<PlayerMain>().transform;
         controller = GetComponent<BossAI>();
+        cam = FindObjectOfType<CameraFollow>();
     }
 
     // Update is called once per frame
@@ -95,7 +102,7 @@ public class BossMovement : MonoBehaviour
     {
         
         slamAttackDuration += Time.deltaTime;
-        print("SLAMMING");
+        //print("SLAMMING");
         if (slamAttackDuration > 3f)
         {
             walkTimer = 0;
@@ -165,7 +172,13 @@ public class BossMovement : MonoBehaviour
                 rightShoulderGoalRot = 35;
 
                 rightElbowGoalRot = -60;
-                moveTimer = .0001f;
+                moveTimer = .000001f;
+
+                if(doShake && Vector3.Distance(baseBody.transform.localPosition, baseBodyGoalPos) < .05f)
+                {
+                    cam.Shake(.2f, 2);
+                    doShake = false;
+                }
             }
             else if(slamAttackDuration > 2.5f)
             {
@@ -185,6 +198,8 @@ public class BossMovement : MonoBehaviour
                 rightHipGoalPos = rightHip.startPos;
                 baseBodyGoalPos = baseBody.startPos;
                 moveTimer = .001f;
+
+                doShake = true;
             }
             
 
@@ -219,14 +234,147 @@ public class BossMovement : MonoBehaviour
     {
         ResetTimers();
         shockwaveAttackDuration += Time.deltaTime;
-        print("SHOCKWAVE");
-        if(shockwaveAttackDuration > 1)
+        
+       
+        if(shockwaveAttackDuration > 5)
         {
             walkTimer = 0;
             doingShockwave = false;
             SetNewLocation(prevLocation);
             shockwaveAttackDuration = 0;
             controller.isAttackingShockwave = false;
+        }
+        else
+        {
+            float leftShoulderGoalRot = leftShoulder.startRot.eulerAngles.z;
+            float rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+            float leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
+            float rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
+            float leftHipGoalRot = leftHip.startRot.eulerAngles.z;
+            float rightHipGoalRot = rightHip.startRot.eulerAngles.z;
+            float leftKneeGoalRot = leftKnee.startRot.eulerAngles.z;
+            float rightKneeGoalRot = rightKnee.startRot.eulerAngles.z;
+            float baseBodyGoalRot = baseBody.startRot.eulerAngles.z;
+
+            Vector3 leftShoulderGoalPos = leftShoulder.startPos;
+            Vector3 rightShoulderGoalPos = rightShoulder.startPos;
+            Vector3 leftHipGoalPos = leftHip.startPos;
+            Vector3 rightHipGoalPos = rightHip.startPos;
+            Vector3 baseBodyGoalPos = baseBody.startPos;
+            float moveTimer = 0;
+
+            if (shockwaveAttackDuration < 1)
+            {
+                baseBodyGoalPos = new Vector3(0, -.73f);
+                baseBodyGoalRot = -50;
+
+                leftShoulderGoalPos = new Vector3(1.72f, -.41f);
+                leftShoulderGoalRot = -145;
+                leftElbowGoalRot = 45;
+
+                rightShoulderGoalPos = new Vector3(.53f, .49f);
+                rightShoulderGoalRot = -70;
+                rightElbowGoalRot = 30;
+
+                leftHipGoalPos = new Vector3(0, -2.17f);
+                leftHipGoalRot = 35;
+                leftKneeGoalRot = -60;
+
+                rightHipGoalPos = new Vector3(-1.47f, -1.19f);
+                rightHipGoalRot = -60;
+                rightKneeGoalRot = 15;
+                moveTimer = .001f;
+
+            }
+            else if (shockwaveAttackDuration < 4.5f)
+            {
+                
+                float checkTime = Mathf.Floor(shockwaveAttackDuration * 10);
+                if (checkTime % 5f == 0 && addPunch)
+                {
+                    punchCounter++;
+                    addPunch = false;
+                    cam.Shake(.1f, 1);
+                }
+                if (checkTime % 5 != 0) addPunch = true;
+                if (punchCounter % 2 == 0)
+                {
+                    rightShoulderGoalRot = -70;
+                    rightElbowGoalRot = 30;
+
+                    leftShoulderGoalRot = -60;
+                    leftElbowGoalRot = -70;
+                }
+                else
+                {
+                    rightShoulderGoalRot = 25;
+                    rightElbowGoalRot = -90;
+
+                    leftShoulderGoalRot = -145;
+                    leftElbowGoalRot = 45;
+                }
+                baseBodyGoalPos = new Vector3(0, -.73f);
+                baseBodyGoalRot = -50;
+                leftShoulderGoalPos = new Vector3(1.72f, -.41f);
+                rightShoulderGoalPos = new Vector3(.53f, .49f);
+
+                leftHipGoalPos = new Vector3(0, -2.17f);
+                leftHipGoalRot = 35;
+                leftKneeGoalRot = -60;
+
+                rightHipGoalPos = new Vector3(-1.47f, -1.19f);
+                rightHipGoalRot = -60;
+                rightKneeGoalRot = 15;
+
+                moveTimer = .0001f;
+
+            }
+            else
+            {
+                leftShoulderGoalRot = leftShoulder.startRot.eulerAngles.z;
+                rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+                leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
+                rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
+                leftHipGoalRot = leftHip.startRot.eulerAngles.z;
+                rightHipGoalRot = rightHip.startRot.eulerAngles.z;
+                leftKneeGoalRot = leftKnee.startRot.eulerAngles.z;
+                rightKneeGoalRot = rightKnee.startRot.eulerAngles.z;
+                baseBodyGoalRot = baseBody.startRot.eulerAngles.z;
+
+                leftShoulderGoalPos = leftShoulder.startPos;
+                rightShoulderGoalPos = rightShoulder.startPos;
+                leftHipGoalPos = leftHip.startPos;
+                rightHipGoalPos = rightHip.startPos;
+                baseBodyGoalPos = baseBody.startPos;
+                moveTimer = .001f;
+            }
+
+
+            baseBody.EaseToNewPosition(baseBodyGoalPos, moveTimer);
+            baseBody.EaseToNewRotation(baseBodyGoalRot, moveTimer);
+
+            leftHip.EaseToNewPosition(leftHipGoalPos, moveTimer);
+            leftHip.EaseToNewRotation(leftHipGoalRot, moveTimer);
+
+            leftKnee.EaseToNewRotation(leftKneeGoalRot, moveTimer);
+
+            rightHip.EaseToNewPosition(rightHipGoalPos, moveTimer);
+            rightHip.EaseToNewRotation(rightHipGoalRot, moveTimer);
+
+            rightKnee.EaseToNewRotation(rightKneeGoalRot, moveTimer);
+
+            leftShoulder.EaseToNewPosition(leftShoulderGoalPos, moveTimer);
+            leftShoulder.EaseToNewRotation(leftShoulderGoalRot, moveTimer);
+
+            leftElbow.EaseToNewRotation(leftElbowGoalRot, moveTimer);
+
+            rightShoulder.EaseToNewPosition(rightShoulderGoalPos, moveTimer);
+            rightShoulder.EaseToNewRotation(rightShoulderGoalRot, moveTimer);
+
+            rightElbow.EaseToNewRotation(rightElbowGoalRot, moveTimer);
+
+
+
         }
     }
 

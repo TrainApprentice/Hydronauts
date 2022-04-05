@@ -13,8 +13,9 @@ public class GameManager : MonoBehaviour
     public Transform bossSpawn;
     public int killCount = 0;
     public BossUI bossHealthBar;
+    public Transform[] encounterPos = new Transform[4];
 
-    private Camera cam;
+    private CameraFollow cam;
     private GameObject lWall, rWall;
     private PlayerMain player;
     private GameObject baseMeleeEnemy, baseRangedEnemy, baseBoss, baseWall;
@@ -40,7 +41,7 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
     }
-    
+
     private void Update()
     {
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1") && !player) ResetGameStats();
@@ -49,6 +50,7 @@ public class GameManager : MonoBehaviour
             if (Time.timeScale == 0) ResumeGame();
             else PauseGame();
         }
+        if(!inEncounter && player) cam.SetNewTarget(player.transform.position, true);
         if (player.isDead && SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1"))
         {
             GoToGameOver();
@@ -152,7 +154,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
         SetWalls(num);
-        cam.GetComponent<CameraFollow>().SwapFreeze(num);
+        cam.SetNewTarget(encounterPos[num-1].position);
         inEncounter = true;
     }
 
@@ -165,12 +167,12 @@ public class GameManager : MonoBehaviour
         inEncounter = false;
         Destroy(rWall);
         Destroy(lWall);
-        cam.GetComponent<CameraFollow>().SwapFreeze(0);
+        cam.SetNewTarget(player.transform.position);
     }
 
     public void ResetGameStats()
     {
-        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        cam = FindObjectOfType<CameraFollow>();
         baseMeleeEnemy = Resources.Load<GameObject>("Prefab/MeleeEnemy");
         baseRangedEnemy = Resources.Load<GameObject>("Prefab/RangedEnemy");
         baseBoss = Resources.Load<GameObject>("Prefab/Boss");
@@ -179,6 +181,8 @@ public class GameManager : MonoBehaviour
 
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         GetComponent<PauseMenu>().FindMenuElements();
+
+        
     }
 
     private void SetWalls(int num)

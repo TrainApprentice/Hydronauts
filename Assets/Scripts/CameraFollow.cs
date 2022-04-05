@@ -5,80 +5,60 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
 
-    public GameObject target;
-    public bool isFrozen = false;
-    public bool isThawing = false;
+    private Vector3 goalPosition;
+    private bool targetIsPlayer = true;
 
-    float alpha = 0;
+    private float shakeTimer = 0f;
+    private float shakeAmount = 0f;
+    private float shakeFalloff = 0;
+    private float shakeStartTime = 0;
+    private Vector3 shakeBase;
 
-    private Vector3 setPosition;
-
-    private bool setLerpOnce = true;
-    private float baseX, baseY;
-    
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        if (isThawing && isFrozen)
+        goalPosition.z = -10;
+        if (targetIsPlayer)
         {
-
-            if(setLerpOnce)
-            {
-                baseX = transform.position.x;
-                baseY = transform.position.y;
-                setLerpOnce = false;
-            }
             
-            if(alpha < .3333f)
-            {
-                alpha += Time.deltaTime;
-                setPosition.x = Mathf.Lerp(baseX, target.transform.position.x, alpha*3);
-                setPosition.y = Mathf.Lerp(baseY, target.transform.position.y, alpha*3);
-                setPosition.z = -10;
-                transform.position = setPosition;
-            }
-           
-            else
-            {
-                isFrozen = false;
-                isThawing = false;
-                setLerpOnce = true;
-                alpha = 0;
-            }
-
+            float distanceToPlayer = Vector3.Distance(transform.position, goalPosition);
+            if (distanceToPlayer > 3) transform.position = AnimMath.Ease(transform.position, goalPosition, .01f);
         }
-        else if(!isThawing && !isFrozen)
+        else
         {
-            setPosition.x = (target.transform.position.x - transform.position.x > 4) ? target.transform.position.x - 4 : (target.transform.position.x - transform.position.x < -4) ? target.transform.position.x + 4 : transform.position.x;
-            setPosition.y = (target.transform.position.y - transform.position.y > 2) ? target.transform.position.y - 2 : (target.transform.position.y - transform.position.y < -2) ? target.transform.position.y + 2 : transform.position.y;
-            setPosition.z = -10;
-            transform.position = setPosition;
+            if (shakeTimer > 0) transform.position = AnimMath.Ease(goalPosition, shakeBase, .001f);
+            else transform.position = AnimMath.Ease(transform.position, goalPosition, .001f);
+            
         }
+        if(shakeTimer > 0) UpdateShake();
     }
 
-    public void SwapFreeze(int currEncounter)
+    public void SetNewTarget(Vector3 newPos, bool targetPlayer = false)
     {
+        goalPosition = newPos;
+        targetIsPlayer = targetPlayer;
+    }
+    void UpdateShake()
+    {
+        shakeTimer -= Time.deltaTime;
+        shakeFalloff = AnimMath.Map(shakeTimer, shakeStartTime, 0, 1, 0f);
+        print(shakeFalloff);
 
-        if (!isFrozen && currEncounter > 0)
-        {
-            if (currEncounter <= 2)
-            {
-                setPosition.y = -3f;
-                transform.position = setPosition;
-            }
-            if(currEncounter == 3)
-            {
+        Vector3 offset = new Vector3(Random.Range(-.1f, .1f), Random.Range(-.1f, .1f)) * shakeAmount;
 
-            }
-            if(currEncounter == 4)
-            {
+        goalPosition += offset * shakeFalloff;
 
-            }
-            isFrozen = true;
-        }
-        else isThawing = true;
-        
+        if (shakeTimer <= 0) goalPosition = shakeBase;
+    }
+
+    public void Shake(float time, float shakeAmt)
+    {
+        if (time > shakeTimer) shakeTimer = time;
+        shakeAmount = shakeAmt;
+        shakeBase = transform.position;
+        shakeFalloff = 1;
+        shakeStartTime = time;
     }
 
     
