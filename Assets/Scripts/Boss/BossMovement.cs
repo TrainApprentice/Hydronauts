@@ -8,6 +8,7 @@ public class BossMovement : MonoBehaviour
 
     private float animIdleTimer = 0;
     private float animWalkTimer = 0;
+    private float animRushTimer = 0;
 
     private int punchCounter = 0;
     private bool addPunch = true;
@@ -65,8 +66,7 @@ public class BossMovement : MonoBehaviour
             else AnimIdle();
         }
         if (doingRush) AnimRush();
-
-        if (walkTimer != 0 && walkTimer != 1) AnimWalk();
+        else if (walkTimer != 0 && walkTimer != 1) AnimWalk();
     }
 
     public void SetNewLocation(Vector3 newPos, int attackType = 0, bool resetWalk = true)
@@ -102,7 +102,6 @@ public class BossMovement : MonoBehaviour
     {
         
         slamAttackDuration += Time.deltaTime;
-        //print("SLAMMING");
         if (slamAttackDuration > 3f)
         {
             walkTimer = 0;
@@ -204,6 +203,16 @@ public class BossMovement : MonoBehaviour
             
 
             
+            if (slamAttackDuration > 1.2f)
+            {
+                controller.SlamHitboxSwap(false);
+            }
+            else if (slamAttackDuration > .8f)
+            {
+                controller.SlamHitboxSwap(true);
+            }
+
+
             baseBody.EaseToNewPosition(baseBodyGoalPos, moveTimer);
             baseBody.EaseToNewRotation(baseBodyGoalRot, moveTimer);
 
@@ -227,7 +236,7 @@ public class BossMovement : MonoBehaviour
 
             rightElbow.EaseToNewRotation(rightElbowGoalRot, moveTimer);
             
-          
+            
         }
     }
     private void AnimShockwave()
@@ -295,6 +304,7 @@ public class BossMovement : MonoBehaviour
                     punchCounter++;
                     addPunch = false;
                     cam.Shake(.1f, 1);
+                    controller.SummonDebris();
                 }
                 if (checkTime % 5 != 0) addPunch = true;
                 if (punchCounter % 2 == 0)
@@ -377,18 +387,15 @@ public class BossMovement : MonoBehaviour
 
         }
     }
-
     private void AnimRush()
     {
         rushAttackDuration += Time.deltaTime;
-        print("RUSHING");
         if(rushAttackDuration < 2)
         {
             Vector3 readyPos = new Vector3(transform.position.x, playerRef.position.y + 2f);
             SetNewLocation(readyPos, 0, false);
-            AnimWalk();
         }
-        else
+        else if(rushAttackDuration > 3)
         {
             if(!setRush)
             {
@@ -396,7 +403,7 @@ public class BossMovement : MonoBehaviour
                 setRush = true;
             }
         }
-        if(rushAttackDuration > 3)
+        if(rushAttackDuration > 4)
         {
             walkTimer = 0;
             doingRush = false;
@@ -405,6 +412,110 @@ public class BossMovement : MonoBehaviour
             controller.isAttackingRush = false;
             rushAttackDuration = 0;
             slowMovement = true;
+            controller.SlamHitboxSwap(false);
+        }
+        else
+        {
+            float leftShoulderGoalRot = leftShoulder.startRot.eulerAngles.z;
+            float rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+            float leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
+            float rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
+            float leftHipGoalRot = leftHip.startRot.eulerAngles.z;
+            float rightHipGoalRot = rightHip.startRot.eulerAngles.z;
+            float leftKneeGoalRot = leftKnee.startRot.eulerAngles.z;
+            float rightKneeGoalRot = rightKnee.startRot.eulerAngles.z;
+            float baseBodyGoalRot = baseBody.startRot.eulerAngles.z;
+
+            Vector3 leftShoulderGoalPos = leftShoulder.startPos;
+            Vector3 rightShoulderGoalPos = rightShoulder.startPos;
+            Vector3 leftHipGoalPos = leftHip.startPos;
+            Vector3 rightHipGoalPos = rightHip.startPos;
+            float moveTimer = 0;
+
+            if(rushAttackDuration < 2)
+            {
+                baseBodyGoalRot = -30;
+
+                leftShoulderGoalPos = new Vector3(1.52f, .87f);
+                leftShoulderGoalRot = -125;
+                leftElbowGoalRot = 35;
+
+                rightShoulderGoalPos = new Vector3(-.48f, 1.5f);
+                rightShoulderGoalRot = -25;
+                rightElbowGoalRot = 30;
+
+                animRushTimer += Time.deltaTime;
+
+                float wave = Mathf.Sin(animRushTimer * 7);
+                float offsetWave = Mathf.Sin((animRushTimer + Mathf.PI) * 7);
+
+                leftHipGoalRot = wave * 25 - 5;
+                rightHipGoalRot = offsetWave * 25 - 15;
+
+                leftKneeGoalRot = wave * 15 - 25;
+                rightKneeGoalRot = offsetWave * 15 + 20;
+
+                moveTimer = .1f;
+            }
+            else if(rushAttackDuration < 3)
+            {
+                baseBodyGoalRot = -30;
+
+                leftShoulderGoalPos = new Vector3(1.52f, .87f);
+                leftShoulderGoalRot = -125;
+                leftElbowGoalRot = 35;
+
+                rightShoulderGoalPos = new Vector3(-.48f, 1.5f);
+                rightShoulderGoalRot = -25;
+                rightElbowGoalRot = 30;
+
+                moveTimer = .01f;
+            }
+            else
+            {
+                baseBodyGoalRot = -30;
+
+                leftShoulderGoalPos = new Vector3(1.52f, .87f);
+                leftShoulderGoalRot = -125;
+                leftElbowGoalRot = 35;
+
+                rightShoulderGoalPos = new Vector3(-.48f, 1.5f);
+                rightShoulderGoalRot = -25;
+                rightElbowGoalRot = 30;
+
+                leftHipGoalPos = new Vector3(.33f, -1.58f);
+                leftHipGoalRot = -50;
+                leftKneeGoalRot = -35;
+
+                rightHipGoalPos = new Vector3(-1.34f, -1.04f);
+                rightHipGoalRot = -55;
+                rightKneeGoalRot = -25;
+
+                moveTimer = .0001f;
+                controller.SlamHitboxSwap(true);
+            }
+            
+            baseBody.EaseToNewRotation(baseBodyGoalRot, moveTimer);
+
+            leftHip.EaseToNewPosition(leftHipGoalPos, moveTimer);
+            leftHip.EaseToNewRotation(leftHipGoalRot, moveTimer);
+
+            leftKnee.EaseToNewRotation(leftKneeGoalRot, moveTimer);
+
+            rightHip.EaseToNewPosition(rightHipGoalPos, moveTimer);
+            rightHip.EaseToNewRotation(rightHipGoalRot, moveTimer);
+
+            rightKnee.EaseToNewRotation(rightKneeGoalRot, moveTimer);
+
+            leftShoulder.EaseToNewPosition(leftShoulderGoalPos, moveTimer);
+            leftShoulder.EaseToNewRotation(leftShoulderGoalRot, moveTimer);
+
+            leftElbow.EaseToNewRotation(leftElbowGoalRot, moveTimer);
+
+            rightShoulder.EaseToNewPosition(rightShoulderGoalPos, moveTimer);
+            rightShoulder.EaseToNewRotation(rightShoulderGoalRot, moveTimer);
+
+            rightElbow.EaseToNewRotation(rightElbowGoalRot, moveTimer);
         }
     }
     private void AnimFlamethrower()
@@ -431,7 +542,6 @@ public class BossMovement : MonoBehaviour
             flameAttackDuration = 0;
         }
     }
-
     private void AnimIdle()
     {
         ResetTimers("IDLE");
@@ -464,7 +574,6 @@ public class BossMovement : MonoBehaviour
         
         
     }
-
     private void AnimWalk()
     {
         animWalkTimer += Time.deltaTime;

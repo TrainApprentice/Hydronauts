@@ -249,6 +249,17 @@ public class PlayerMain : MonoBehaviour
             if (collision.GetComponent<FireProjectile>()) ApplyDamage(collision.GetComponent<FireProjectile>().damage);
         }
 
+        if(collision.CompareTag("Falling"))
+        {
+            ApplyDamage(collision.GetComponent<DebrisCollision>().damage);
+            collision.GetComponent<DebrisCollision>().DestroyMe();
+        }
+
+        if(collision.CompareTag("Slam"))
+        {
+            ApplyDamage(4);
+        }
+
     }
 
     private void RunDousing()

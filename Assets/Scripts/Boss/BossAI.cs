@@ -5,8 +5,10 @@ using UnityEngine;
 public class BossAI : MonoBehaviour
 {
     public GameObject fireProj;
+    public GameObject fallingDebris;
     public Transform fireSpawnLeft, fireSpawnRight;
     public Transform playerRef;
+    public GameObject slamHitbox;
     
     private Transform[] fireAttackPositions = new Transform[3];
     private BossUI healthController;
@@ -129,5 +131,21 @@ public class BossAI : MonoBehaviour
     public void RushAttack()
     {
         mover.BeginRush();
+    }
+    public void SummonDebris()
+    {
+        float randChance = Random.Range(0, 1);
+        int numDebris = 0;
+
+        numDebris = (randChance < .7f) ? 1 : 2;
+
+        for(int i = 0; i < numDebris; i++)
+        {
+            GameObject newDebris = Instantiate(fallingDebris);
+        }
+    }
+    public void SlamHitboxSwap(bool turnOn)
+    {
+        slamHitbox.SetActive(turnOn);
     }
 }

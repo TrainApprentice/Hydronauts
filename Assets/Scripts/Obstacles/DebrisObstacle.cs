@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DebrisObstacle : MonoBehaviour
 {
-    public bool isFalling = false;
     private float currHealth, maxHealth;
     private float size;
 
