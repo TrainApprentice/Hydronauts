@@ -10,7 +10,9 @@ public class BossAI : MonoBehaviour
     public Transform playerRef;
     public GameObject slamHitbox;
     
-    private Transform[] fireAttackPositions = new Transform[3];
+    [HideInInspector]
+    public Transform[] fireAttackPositions = new Transform[3];
+
     private BossUI healthController;
 
     public bool isAttackingFire = false;
@@ -22,6 +24,7 @@ public class BossAI : MonoBehaviour
 
     private BossMovement mover;
     private Transform shockwavePos;
+    private float timeBetweenAttacks = 10f;
     private int currPhase = 1;
     private int flamePattern = 1;
     private float fireAttackTimer = 2f;
@@ -38,37 +41,75 @@ public class BossAI : MonoBehaviour
 
         healthController = FindObjectOfType<BossUI>();
         //healthController.gameObject.SetActive(true);
+
+        
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown("k") && !isAttackingFire)
+        if (timeBetweenAttacks > 0) timeBetweenAttacks -= Time.deltaTime;
+        else
         {
-            FlamethrowerAttack();
-            
-            fireAttackTimer = 2f;
-        }
-        if(Input.GetKeyDown("o") && !isAttackingSlam)
-        {
-            SlamAttack();
-            isAttackingSlam = true;
-        }
-        if(Input.GetKeyDown("u") && !isAttackingShockwave)
-        {
-            ShockwaveAttack();
-            isAttackingShockwave = true;
-        }
-        if(Input.GetKeyDown("y") && !isAttackingRush)
-        {
-            RushAttack();
-            isAttackingRush = true;
+            timeBetweenAttacks = 8f;
+            if (currPhase == 1)
+            {
+                float randAttack = Random.Range(0f, 1f);
+                print(randAttack);
+
+                if(randAttack < .4f)
+                {
+                    FlamethrowerAttack();
+                    fireAttackTimer = 2f;
+                }
+                else if(randAttack < .8f)
+                {
+                    SlamAttack();
+                    isAttackingSlam = true;
+                }
+                else
+                {
+                    ShockwaveAttack();
+                    isAttackingShockwave = true;
+                    timeBetweenAttacks = 10;
+                }
+
+                
+            }
+            else if (currPhase == 2)
+            {
+                timeBetweenAttacks = 6f;
+                float randAttack = Random.Range(0f, 1f);
+                if(randAttack < .3f)
+                {
+                    RushAttack();
+                    isAttackingRush = true;
+                }
+                else if(randAttack < .6f)
+                {
+                    ShockwaveAttack();
+                    isAttackingShockwave = true;
+                    timeBetweenAttacks = 8f;
+                }
+                else if(randAttack < .85f)
+                {
+                    FlamethrowerAttack();
+                    fireAttackTimer = 2f;
+                }
+                else
+                {
+                    SlamAttack();
+                    isAttackingSlam = true;
+                }
+                
+            }
         }
 
-        if (isAttackingFire) FlamethrowerAttack(flamePattern);
+        if (isAttackingFire) FlamethrowerPattern(flamePattern);
     }
 
-    public void FlamethrowerAttack(int choosePattern)
+    public void FlamethrowerPattern(int choosePattern)
     {
         if (timeBetweenFlames > 0) timeBetweenFlames -= Time.deltaTime;
         if(fireAttackTimer > 0) fireAttackTimer -= Time.deltaTime;
@@ -102,7 +143,6 @@ public class BossAI : MonoBehaviour
             isAttackingFire = false;
             if (flamePattern < 3) flamePattern++;
             else flamePattern = 1;
-            print(flamePattern);
             timeBetweenFlames = 0;
         }
         
@@ -112,21 +152,22 @@ public class BossAI : MonoBehaviour
         health -= damage;
         healthController.SetCurrentHealth(health);
 
+        if (health <= 50) currPhase = 2;
         if (health <= 0) Destroy(gameObject);
     }
 
     public void FlamethrowerAttack()
     {
-        mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, flamePattern + 5);
+        mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, false, flamePattern + 5);
     }
     public void SlamAttack()
     {
-        mover.SetNewLocation(playerRef.position - new Vector3(3f, -2.5f, 0), 1);
+        mover.SetNewLocation(playerRef.position - new Vector3(3f, -2.5f, 0), false, 1);
     }
 
     public void ShockwaveAttack() 
     {
-        mover.SetNewLocation(shockwavePos.position, 2);
+        mover.SetNewLocation(shockwavePos.position, false, 2);
     }
     public void RushAttack()
     {
@@ -147,5 +188,14 @@ public class BossAI : MonoBehaviour
     public void SlamHitboxSwap(bool turnOn)
     {
         slamHitbox.SetActive(turnOn);
+    }
+
+    public void PhaseChange()
+    {
+
+    }
+    public void DeathScene()
+    {
+
     }
 }

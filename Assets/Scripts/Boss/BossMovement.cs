@@ -45,6 +45,8 @@ public class BossMovement : MonoBehaviour
         playerRef = FindObjectOfType<PlayerMain>().transform;
         controller = GetComponent<BossAI>();
         cam = FindObjectOfType<CameraFollow>();
+
+        SetNewLocation(controller.fireAttackPositions[2].position + new Vector3(2, 0), true, 0, true);
     }
 
     // Update is called once per frame
@@ -69,9 +71,10 @@ public class BossMovement : MonoBehaviour
         else if (walkTimer != 0 && walkTimer != 1) AnimWalk();
     }
 
-    public void SetNewLocation(Vector3 newPos, int attackType = 0, bool resetWalk = true)
+    public void SetNewLocation(Vector3 newPos, bool doSlow = false, int attackType = 0, bool resetWalk = true)
     {
         if(resetWalk) walkTimer = 0;
+        slowMovement = doSlow;
         nextLocation = newPos;
         prevLocation = currLocation;
         
@@ -393,7 +396,7 @@ public class BossMovement : MonoBehaviour
         if(rushAttackDuration < 2)
         {
             Vector3 readyPos = new Vector3(transform.position.x, playerRef.position.y + 2f);
-            SetNewLocation(readyPos, 0, false);
+            SetNewLocation(readyPos, false, 0, false);
         }
         else if(rushAttackDuration > 3)
         {
@@ -639,4 +642,5 @@ public class BossMovement : MonoBehaviour
         rightKnee.EaseToStartPosition(timer);
         rightKnee.EaseToStartRotation(timer);
     }
+
 }
