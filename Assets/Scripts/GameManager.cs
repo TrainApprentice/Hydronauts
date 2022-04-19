@@ -15,13 +15,21 @@ public class GameManager : MonoBehaviour
     public BossUI bossHealthBar;
     public Transform[] encounterPos = new Transform[4];
 
+    [HideInInspector]
+    public PlayerMain player;
+    [HideInInspector]
+    public int maxEncounter = 0;
+    [HideInInspector]
+    public int totalKills = 0;
+    [HideInInspector]
+    public bool hasWon = false;
+
     private CameraFollow cam;
     private GameObject lWall, rWall;
-    private PlayerMain player;
     private GameObject baseMeleeEnemy, baseRangedEnemy, baseBoss, baseWall;
     private BossAI currBoss;
-    
     private List<EnemyMain> enemies = new List<EnemyMain>();
+
     private bool inEncounter = false;
     private int currEncounter = 0;
     private int killGoal = 0;
@@ -128,8 +136,12 @@ public class GameManager : MonoBehaviour
             {
                 Destroy(enemies[i].gameObject);
                 enemies.Remove(enemies[i]);
-                
-                if(inEncounter) killCount++;
+
+                if (inEncounter)
+                {
+                    killCount++;
+                    totalKills++;
+                }
             }
         }
     }
@@ -163,6 +175,7 @@ public class GameManager : MonoBehaviour
         killCount = 0;
         killGoal = 0;
         currEnemies = 0;
+        maxEncounter = currEncounter;
         currEncounter = 0;
         inEncounter = false;
         Destroy(rWall);
@@ -182,7 +195,22 @@ public class GameManager : MonoBehaviour
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         GetComponent<PauseMenu>().FindMenuElements();
 
-        
+        if(SaveFiles.instance.CheckDataInSlot(SaveFiles.instance.chosenSlot))
+        {
+            LoadInSaveData();
+        }
+    }
+
+    private void LoadInSaveData()
+    {
+        player.transform.position = SaveFiles.instance.playerPos;
+        player.hasSpecial = SaveFiles.instance.playerHasSpecial;
+        player.health = SaveFiles.instance.playerHealth;
+        player.specialMeter = SaveFiles.instance.specialMeter;
+        player.currSpecial = SaveFiles.instance.currentSpecial;
+
+        totalKills = SaveFiles.instance.enemiesKilled;
+        maxEncounter = SaveFiles.instance.lastEncounter;
     }
 
     private void SetWalls(int num)

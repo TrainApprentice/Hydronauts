@@ -15,6 +15,7 @@ public class GameOver : MonoBehaviour
     public void ShowLevelSlots()
     {
         levelSlots.SetActive(true);
+        SaveFiles.instance.UpdateAllSlots();
     }
     public void HideLevelSlots()
     {
@@ -28,6 +29,7 @@ public class GameOver : MonoBehaviour
     {
         // Replace with load game
         SceneManager.LoadScene("Level1");
+        SaveFiles.instance.LoadGame(slotNum);
     }
     public void ShowQuitWarning()
     {
@@ -41,7 +43,7 @@ public class GameOver : MonoBehaviour
         quitWarning.SetActive(false);
     }
 
-    // Also for Game Over
+    
     public void QuitGame()
     {
         Application.Quit();

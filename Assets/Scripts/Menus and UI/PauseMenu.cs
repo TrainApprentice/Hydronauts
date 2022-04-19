@@ -14,9 +14,16 @@ public class PauseMenu : MonoBehaviour
 
     private int currSaveSlot = 0;
 
+    public void CheckSlot(int slotNum)
+    {
+        currSaveSlot = slotNum;
+        if (SaveFiles.instance.CheckDataInSlot(slotNum)) ShowConfirmOverwrite();
+        else SaveGame();
+    }
     public void ShowSaveSlots()
     {
         saveSlots.SetActive(true);
+        SaveFiles.instance.UpdateAllSlots();
     }
     public void HideSaveSlots()
     {
@@ -25,10 +32,20 @@ public class PauseMenu : MonoBehaviour
     }
     public void SaveGame()
     {
-
+        if(SaveFiles.instance.CheckDataInSlot(currSaveSlot))
+        {
+            SaveFiles.instance.DeleteData(currSaveSlot);
+        }
         // Save the game
         print("Game saved in slot " + currSaveSlot);
+        PlayerMain player = GameManager.instance.player;
+        int kills = GameManager.instance.totalKills;
+        int encounter = GameManager.instance.maxEncounter;
+        int level = (GameManager.instance.hasWon) ? 1 : 0;
+        Vector3 position = (encounter > 0) ? GameManager.instance.encounterPos[encounter - 1].position - new Vector3(3, 0) : new Vector3(-5, -.5f);
+        SaveFiles.instance.SaveGame(player, position, currSaveSlot, kills, level, encounter);
         confirmOverwrite.SetActive(false);
+        SaveFiles.instance.UpdateAllSlots();
     }
 
     public void ShowMenuWarning()
@@ -43,10 +60,9 @@ public class PauseMenu : MonoBehaviour
         menuWarning.SetActive(false);
     }
 
-    public void ShowConfirmOverwrite(int slotNum)
+    public void ShowConfirmOverwrite()
     {
         confirmOverwrite.SetActive(true);
-        currSaveSlot = slotNum;
     }
     public void HideConfirmOverwrite()
     {
@@ -128,16 +144,16 @@ public class PauseMenu : MonoBehaviour
                 case "BackFromQuit":
                     b.onClick.AddListener(HideQuitWarning);
                     break;
-                case "Slot1":
-                    UnityEngine.Events.UnityAction temp1 = () => { ShowConfirmOverwrite(1); };
+                case "Slot 1":
+                    UnityEngine.Events.UnityAction temp1 = () => { CheckSlot(1); };
                     b.onClick.AddListener(temp1);
                     break;
-                case "Slot2":
-                    UnityEngine.Events.UnityAction temp2 = () => { ShowConfirmOverwrite(2); };
+                case "Slot 2":
+                    UnityEngine.Events.UnityAction temp2 = () => { CheckSlot(2); };
                     b.onClick.AddListener(temp2);
                     break;
-                case "Slot3":
-                    UnityEngine.Events.UnityAction temp3 = () => { ShowConfirmOverwrite(3); };
+                case "Slot 3":
+                    UnityEngine.Events.UnityAction temp3 = () => { CheckSlot(3); };
                     b.onClick.AddListener(temp3);
                     break;
                 case "ConfirmOverwrite":

@@ -14,16 +14,23 @@ public class PlayerMain : MonoBehaviour
     public SpriteRenderer sprite;
     public GameObject sprinklerAttack, blastAttack, dousingBox;
 
+    [HideInInspector]
     public int health = 10;
+    [HideInInspector]
     public int maxHealth = 10;
+    [HideInInspector]
     public float specialMeter = 10f;
+    [HideInInspector]
     public float maxSpecialMeter = 10f;
+    [HideInInspector]
     public bool isDead = false;
+    [HideInInspector]
+    public string currSpecial = "sprinkler";
+    [HideInInspector]
+    public bool hasSpecial = true;
 
     private bool isInvincible = false;
     private float iFrames = 0f;
-    private bool hasSpecial = true;
-    private string currSpecial = "sprinkler";
     private float specialRechargeRate = .25f;
 
     private float animResetTimer = 0f;
@@ -417,6 +424,7 @@ public class PlayerMain : MonoBehaviour
                 AnimUpdate("basicHeavy");
             }
         }
+        
         
         
         

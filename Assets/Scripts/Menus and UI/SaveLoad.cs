@@ -14,7 +14,6 @@ public class SaveLoad : MonoBehaviour
     public void ShowLoadDelete(int slotNum)
     {
         fileChoice.SetActive(true);
-        print(fileChoice.transform.position.y);
         fileChoice.transform.position = new Vector3(4.63f, 3 * (2 - slotNum), 1);
         currSlotSelection = slotNum;
     }
@@ -26,7 +25,7 @@ public class SaveLoad : MonoBehaviour
     
     public void LoadGame()
     {
-        // Replace with load game
+        SaveFiles.instance.LoadGame(currSlotSelection);
         SceneManager.LoadScene("Level1");
     }
 
@@ -43,7 +42,8 @@ public class SaveLoad : MonoBehaviour
     public void DeleteSave()
     {
         // Pop up Are You Sure?
-        print("Save Deleted from slot " + currSlotSelection);
+
+        SaveFiles.instance.DeleteData(currSlotSelection);
         HideDeleteWarning();
         HideLoadDelete();
 
