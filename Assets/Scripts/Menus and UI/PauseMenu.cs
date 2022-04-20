@@ -17,8 +17,16 @@ public class PauseMenu : MonoBehaviour
     public void CheckSlot(int slotNum)
     {
         currSaveSlot = slotNum;
-        if (SaveFiles.instance.CheckDataInSlot(slotNum)) ShowConfirmOverwrite();
-        else SaveGame();
+        if (!SaveFiles.instance.CheckDataInSlot(currSaveSlot))
+        {
+            print("Instant");
+            SaveGame();
+        }
+        else
+        {
+            print("Delay");
+            ShowConfirmOverwrite();
+        }
     }
     public void ShowSaveSlots()
     {
@@ -104,7 +112,7 @@ public class PauseMenu : MonoBehaviour
         
 
         SetButtonFunctions();
-
+        print("Bing");
         pauseMenu.SetActive(false);
         saveSlots.SetActive(false);
         quitWarning.SetActive(false);

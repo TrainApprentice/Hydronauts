@@ -37,7 +37,10 @@ public class BossUI : MonoBehaviour
             if (prevHealth - currHealth < .01f) prevHealth = currHealth;
             healthBar.localScale = new Vector3(prevHealth / 100, 1, 1);
         }
-        if (prevHealth <= .1f && currHealth <= 0) Destroy(gameObject);
+        if (prevHealth <= .1f && currHealth <= 0)
+        {
+            Destroy(gameObject);
+        }
         
     }
 

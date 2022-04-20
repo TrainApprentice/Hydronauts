@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-
+    private PlayerMain playerRef;
     private Vector3 goalPosition;
     private bool targetIsPlayer = true;
 
@@ -14,6 +14,12 @@ public class CameraFollow : MonoBehaviour
     private float shakeStartTime = 0;
     private Vector3 shakeBase;
 
+    private void Start()
+    {
+        playerRef = FindObjectOfType<PlayerMain>();
+        goalPosition = playerRef.transform.position;
+
+    }
 
     // Update is called once per frame
     void LateUpdate()
@@ -21,7 +27,7 @@ public class CameraFollow : MonoBehaviour
         goalPosition.z = -10;
         if (targetIsPlayer)
         {
-            
+            goalPosition = playerRef.transform.position - new Vector3(0, 0, 10);
             float distanceToPlayer = Vector3.Distance(transform.position, goalPosition);
             if (distanceToPlayer > 3) transform.position = AnimMath.Ease(transform.position, goalPosition, .01f);
         }

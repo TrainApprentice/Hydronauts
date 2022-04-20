@@ -10,10 +10,14 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     public GameObject pauseMenu;
+    public GameObject powerupBase;
     public Transform bossSpawn;
     public int killCount = 0;
     public BossUI bossHealthBar;
     public Transform[] encounterPos = new Transform[4];
+    public TutorialMove movementTut, combatTut, specialTut;
+    public Transform powerSpawn1, powerSpawn2;
+    public GameObject encounter1, encounter2, encounter3;
 
     [HideInInspector]
     public PlayerMain player;
@@ -41,12 +45,15 @@ public class GameManager : MonoBehaviour
         if (instance)
         {
             Destroy(gameObject);
+
         }
 
         else
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            ResetGameStats();
+            print("Thing");
         }
     }
 
@@ -66,13 +73,13 @@ public class GameManager : MonoBehaviour
             
         }
 
-
+        
     }
 
     private void FixedUpdate()
     {
+        
         UpdateEnemies();
-
         if (inEncounter && currEnemies < killGoal)
         {
             if (enemySpawnCooldown > 0) enemySpawnCooldown -= Time.fixedDeltaTime;
@@ -124,6 +131,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         pauseMenu.SetActive(false);
     }
+    public void StartEndCutscene()
+    {
+        player.isInCutscene = true;
+        SceneManager.LoadScene("EndScene");
+    }
     private void GoToGameOver()
     {
         SceneManager.LoadScene("GameOver");
@@ -153,6 +165,8 @@ public class GameManager : MonoBehaviour
         {
             case 1:
                 killGoal = 5;
+                movementTut.SetNewPosition(false);
+                combatTut.SetNewPosition(true);
                 break;
             case 2:
                 killGoal = 10;
@@ -169,9 +183,13 @@ public class GameManager : MonoBehaviour
         cam.SetNewTarget(encounterPos[num-1].position);
         inEncounter = true;
     }
-
+    public void ShowSpecialTutorial()
+    {
+        specialTut.SetNewPosition(true);
+    }
     public void EndEncounter()
     {
+        
         killCount = 0;
         killGoal = 0;
         currEnemies = 0;
@@ -181,6 +199,7 @@ public class GameManager : MonoBehaviour
         Destroy(rWall);
         Destroy(lWall);
         cam.SetNewTarget(player.transform.position);
+        if (maxEncounter == 1) combatTut.SetNewPosition(false);
     }
 
     public void ResetGameStats()
@@ -194,11 +213,30 @@ public class GameManager : MonoBehaviour
 
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         GetComponent<PauseMenu>().FindMenuElements();
-
-        if(SaveFiles.instance.CheckDataInSlot(SaveFiles.instance.chosenSlot))
+        
+        if(SaveFiles.instance)
         {
-            LoadInSaveData();
+            if (SaveFiles.instance.CheckDataInSlot(SaveFiles.instance.chosenSlot))
+            {
+                LoadInSaveData();
+                player.Reset();
+
+            }
+            else
+            {
+                movementTut.SetNewPosition(true);
+                SpawnPowerups();
+                player.Reset(false);
+            }
+            
         }
+        else
+        {
+            movementTut.SetNewPosition(true);
+            SpawnPowerups();
+            player.Reset(false);
+        }
+        
     }
 
     private void LoadInSaveData()
@@ -211,6 +249,30 @@ public class GameManager : MonoBehaviour
 
         totalKills = SaveFiles.instance.enemiesKilled;
         maxEncounter = SaveFiles.instance.lastEncounter;
+
+        if (maxEncounter > 0) encounter1.SetActive(false);
+        if (maxEncounter > 1) encounter2.SetActive(false);
+        if (maxEncounter > 2) encounter3.SetActive(false);
+
+        if (!player.hasSpecial) SpawnPowerups();
+    }
+    private void SpawnPowerups()
+    {
+        PowerupPickup[] temp = FindObjectsOfType<PowerupPickup>();
+        if(temp.Length > 0)
+        {
+            foreach (PowerupPickup p in temp)
+            {
+                Destroy(p.gameObject);
+            }
+        }
+        
+
+        GameObject p1 = Instantiate(powerupBase, powerSpawn1);
+        p1.GetComponent<PowerupPickup>().powerupType = 1;
+
+        GameObject p2 = Instantiate(powerupBase, powerSpawn2);
+        p2.GetComponent<PowerupPickup>().powerupType = 2;
     }
 
     private void SetWalls(int num)
@@ -236,6 +298,9 @@ public class GameManager : MonoBehaviour
 
         }
     }
-
+    private void OnDestroy()
+    {
+        
+    }
 
 }

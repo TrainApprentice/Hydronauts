@@ -15,11 +15,11 @@ public class PlayerMain : MonoBehaviour
     public GameObject sprinklerAttack, blastAttack, dousingBox;
 
     [HideInInspector]
-    public int health = 10;
+    public int health = 15;
     [HideInInspector]
-    public int maxHealth = 10;
+    public int maxHealth = 15;
     [HideInInspector]
-    public float specialMeter = 10f;
+    public float specialMeter = 0f;
     [HideInInspector]
     public float maxSpecialMeter = 10f;
     [HideInInspector]
@@ -28,6 +28,8 @@ public class PlayerMain : MonoBehaviour
     public string currSpecial = "sprinkler";
     [HideInInspector]
     public bool hasSpecial = true;
+    [HideInInspector]
+    public bool isInCutscene = false;
 
     private bool isInvincible = false;
     private float iFrames = 0f;
@@ -37,7 +39,6 @@ public class PlayerMain : MonoBehaviour
     private float perfectBlockTimer = 0;
 
     private float moveSpeed = 5f;
-    private float jumpForce = 5000f;
     
     private float specialDuration = 0f;
     private bool canMove = true;
@@ -80,7 +81,7 @@ public class PlayerMain : MonoBehaviour
         // If there's a save, load those stats
         // Otherwise, reset to default values
 
-        Reset();
+        //Reset(false);
     }
 
     // Update is called once per frame
@@ -93,7 +94,7 @@ public class PlayerMain : MonoBehaviour
         {
             canAttack = false;
             canBlock = false;
-            if (currSpecial == "blast") canMove = false;
+            //if (currSpecial == "blast") canMove = false;
             if (specialDuration - Time.deltaTime == 0) specialDuration -= Time.deltaTime * 1.1f;
             else specialDuration -= Time.deltaTime;
 
@@ -103,8 +104,7 @@ public class PlayerMain : MonoBehaviour
             specialDuration = 0;
             canAttack = true;
             canBlock = true;
-            if (currSpecial == "blast") canMove = true;
-            if (currSpecial == "sprinkler") moveSpeed = 5f;
+            moveSpeed = 5f;
         }
         
 
@@ -119,12 +119,13 @@ public class PlayerMain : MonoBehaviour
         }
         else specialMeter = 0;
 
-        if (canMove)
+        if (canMove && !isInCutscene)
         {
             movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
             movement.y = Input.GetAxisRaw("Vertical") * .75f;
         }
-        else movement = Vector2.zero;
+        else if(!isInCutscene) movement = Vector2.zero;
+        
 
 
         if (movement != Vector2.zero && !isWalking && specialDuration <= 0)
@@ -193,12 +194,12 @@ public class PlayerMain : MonoBehaviour
 
         if(isBlocking)
         {
-            sprite.color = new Color(.8f, .8f, .8f);
+            //sprite.color = new Color(.8f, .8f, .8f);
         }
-        else sprite.color = new Color(1, 1, 1);
+        
 
         // DEBUG ONLY
-        
+        /*
         if (Input.GetKeyDown("l"))
         {
             cam.Shake(.1f, 1);
@@ -213,7 +214,7 @@ public class PlayerMain : MonoBehaviour
             currSpecial = "sprinkler";
             specialMeter = maxSpecialMeter;
         }
-
+        */
         if (health <= 0) isDead = true;
 
     }
@@ -230,7 +231,7 @@ public class PlayerMain : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Encounter")
+        if (collision.CompareTag("Encounter"))
         {
             switch (collision.gameObject.name)
             {
@@ -265,6 +266,17 @@ public class PlayerMain : MonoBehaviour
         if(collision.CompareTag("Slam"))
         {
             ApplyDamage(4);
+        }
+        if(collision.CompareTag("Powerup"))
+        {
+            currSpecial = (collision.GetComponent<PowerupPickup>().powerupType == 1) ? "blast" : "sprinkler";
+            PowerupPickup[] temp = FindObjectsOfType<PowerupPickup>();
+            foreach(PowerupPickup p in temp)
+            {
+                Destroy(p.gameObject);
+            }
+            specialMeter = maxSpecialMeter;
+            hasSpecial = true;
         }
 
     }
@@ -429,13 +441,18 @@ public class PlayerMain : MonoBehaviour
         
         
     }
-    public void Reset()
+    public void Reset(bool hasData = true)
     {
-        health = maxHealth;
+        
         isDead = false;
-        //hasSpecial = false;
-        //specialDuration = 0;
-        //specialMeter = 0;
+        if(!hasData)
+        {
+            health = maxHealth;
+            hasSpecial = false;
+            specialDuration = 0;
+            specialMeter = 0;
+        }
+        
     }
 
     private void ActivateSpecial()
@@ -449,7 +466,7 @@ public class PlayerMain : MonoBehaviour
                     specialDuration = 1f;
                     GameObject newBlast = Instantiate(blastAttack, transform.position, Quaternion.identity);
                     if (transform.localScale.x < 0) newBlast.GetComponent<Blast>().flipDirection = true;
-                    canMove = false;
+                    moveSpeed = 2f;
                     break;
                 case "sprinkler":
                     specialMeter -= 6f;

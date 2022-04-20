@@ -19,6 +19,7 @@ public class BossAI : MonoBehaviour
     public bool isAttackingSlam = false;
     public bool isAttackingRush = false;
     public bool isAttackingShockwave = false;
+    public bool isDead = false;
 
     public int health = 100;
 
@@ -49,64 +50,68 @@ public class BossAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (timeBetweenAttacks > 0) timeBetweenAttacks -= Time.deltaTime;
-        else
+        if(!isDead)
         {
-            timeBetweenAttacks = 8f;
-            if (currPhase == 1)
+            if (timeBetweenAttacks > 0) timeBetweenAttacks -= Time.deltaTime;
+            else
             {
-                float randAttack = Random.Range(0f, 1f);
-                print(randAttack);
+                timeBetweenAttacks = 8f;
+                if (currPhase == 1)
+                {
+                    float randAttack = Random.Range(0f, 1f);
+                    print(randAttack);
 
-                if(randAttack < .4f)
-                {
-                    FlamethrowerAttack();
-                    fireAttackTimer = 2f;
-                }
-                else if(randAttack < .8f)
-                {
-                    SlamAttack();
-                    isAttackingSlam = true;
-                }
-                else
-                {
-                    ShockwaveAttack();
-                    isAttackingShockwave = true;
-                    timeBetweenAttacks = 10;
-                }
+                    if (randAttack < .4f)
+                    {
+                        FlamethrowerAttack();
+                        fireAttackTimer = 2f;
+                    }
+                    else if (randAttack < .8f)
+                    {
+                        SlamAttack();
+                        isAttackingSlam = true;
+                    }
+                    else
+                    {
+                        ShockwaveAttack();
+                        isAttackingShockwave = true;
+                        timeBetweenAttacks = 10;
+                    }
 
-                
+
+                }
+                else if (currPhase == 2)
+                {
+                    timeBetweenAttacks = 6f;
+                    float randAttack = Random.Range(0f, 1f);
+                    if (randAttack < .3f)
+                    {
+                        RushAttack();
+                        isAttackingRush = true;
+                    }
+                    else if (randAttack < .6f)
+                    {
+                        ShockwaveAttack();
+                        isAttackingShockwave = true;
+                        timeBetweenAttacks = 8f;
+                    }
+                    else if (randAttack < .85f)
+                    {
+                        FlamethrowerAttack();
+                        fireAttackTimer = 2f;
+                    }
+                    else
+                    {
+                        SlamAttack();
+                        isAttackingSlam = true;
+                    }
+
+                }
             }
-            else if (currPhase == 2)
-            {
-                timeBetweenAttacks = 6f;
-                float randAttack = Random.Range(0f, 1f);
-                if(randAttack < .3f)
-                {
-                    RushAttack();
-                    isAttackingRush = true;
-                }
-                else if(randAttack < .6f)
-                {
-                    ShockwaveAttack();
-                    isAttackingShockwave = true;
-                    timeBetweenAttacks = 8f;
-                }
-                else if(randAttack < .85f)
-                {
-                    FlamethrowerAttack();
-                    fireAttackTimer = 2f;
-                }
-                else
-                {
-                    SlamAttack();
-                    isAttackingSlam = true;
-                }
-                
-            }
+
+            if (isAttackingFire) FlamethrowerPattern(flamePattern);
         }
-
-        if (isAttackingFire) FlamethrowerPattern(flamePattern);
+        
     }
 
     public void FlamethrowerPattern(int choosePattern)
@@ -153,7 +158,7 @@ public class BossAI : MonoBehaviour
         healthController.SetCurrentHealth(health);
 
         if (health <= 50) currPhase = 2;
-        if (health <= 0) Destroy(gameObject);
+        if (health <= 0) isDead = true; ;
     }
 
     public void FlamethrowerAttack()

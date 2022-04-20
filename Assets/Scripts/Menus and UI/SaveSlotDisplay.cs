@@ -15,8 +15,10 @@ public class SaveSlotDisplay : MonoBehaviour
     public TMP_Text slotNumber, specialText;
     public TMP_Text levelDisplay, killDisplay;
     public Image specialImageDisplay;
+   
 
     public Sprite blastSprite, sprinklerSprite;
+    public Sprite emptySave, filledSave;
     
     public void UpdateVisuals()
     {
@@ -27,7 +29,7 @@ public class SaveSlotDisplay : MonoBehaviour
             specialText.gameObject.SetActive(true);
             killDisplay.text = "Total Enemies Defeated: " + enemiesKilled;
             levelDisplay.text = "Levels Completed: " + currLevel;
-
+            GetComponent<Image>().sprite = filledSave;
             switch (currSpecial)
             {
                 case "blast":
@@ -50,7 +52,7 @@ public class SaveSlotDisplay : MonoBehaviour
             levelDisplay.text = "";
             specialImageDisplay.gameObject.SetActive(false);
             specialText.gameObject.SetActive(false);
-
+            GetComponent<Image>().sprite = emptySave;
         }
     }
 }

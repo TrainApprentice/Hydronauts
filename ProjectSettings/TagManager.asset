@@ -17,6 +17,7 @@ TagManager:
   - Boss
   - Falling
   - Slam
+  - Powerup
   layers:
   - Default
   - TransparentFX

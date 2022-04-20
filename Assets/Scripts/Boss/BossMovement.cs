@@ -9,6 +9,7 @@ public class BossMovement : MonoBehaviour
     private float animIdleTimer = 0;
     private float animWalkTimer = 0;
     private float animRushTimer = 0;
+    private float animDeathTimer = 0;
 
     private int punchCounter = 0;
     private bool addPunch = true;
@@ -52,23 +53,27 @@ public class BossMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currLocation != nextLocation)
+        if (!controller.isDead)
         {
-            if (walkTimer < 1) walkTimer += (slowMovement) ? Time.deltaTime / 2 : Time.deltaTime;
-            else walkTimer = 1;
-            currLocation = AnimMath.Lerp(prevLocation, nextLocation, walkTimer);
-        }
-        transform.position = currLocation;
+            if (currLocation != nextLocation)
+            {
+                if (walkTimer < 1) walkTimer += (slowMovement) ? Time.deltaTime / 2 : Time.deltaTime;
+                else walkTimer = 1;
+                currLocation = AnimMath.Lerp(prevLocation, nextLocation, walkTimer);
+            }
+            transform.position = currLocation;
 
-        if(walkTimer == 1 || walkTimer == 0)
-        {
-            if (doingSlam) AnimSlam();
-            else if (doingShockwave) AnimShockwave();
-            else if (doingFlames) AnimFlamethrower();
-            else AnimIdle();
+            if (walkTimer == 1 || walkTimer == 0)
+            {
+                if (doingSlam) AnimSlam();
+                else if (doingShockwave) AnimShockwave();
+                else if (doingFlames) AnimFlamethrower();
+                else AnimIdle();
+            }
+            if (doingRush) AnimRush();
+            else if (walkTimer != 0 && walkTimer != 1) AnimWalk();
         }
-        if (doingRush) AnimRush();
-        else if (walkTimer != 0 && walkTimer != 1) AnimWalk();
+        else AnimDeath();
     }
 
     public void SetNewLocation(Vector3 newPos, bool doSlow = false, int attackType = 0, bool resetWalk = true)
@@ -155,15 +160,15 @@ public class BossMovement : MonoBehaviour
                 baseBodyGoalRot = -60;
                 baseBodyGoalPos = new Vector3(1.58f, -1.43f);
 
-                leftHipGoalPos = new Vector3(.43f, -2.43f);
-                leftHipGoalRot = 13;
+                leftHipGoalPos = new Vector3(.82f, -3.17f);
+                leftHipGoalRot = 0;
 
-                leftKneeGoalRot = -40;
+                leftKneeGoalRot = -22;
 
-                rightHipGoalPos = new Vector3(0, -2,17f);
-                rightHipGoalRot = -12;
+                rightHipGoalPos = new Vector3(-.83f, -1.29f);
+                rightHipGoalRot = -73;
 
-                rightKneeGoalRot = -25;
+                rightKneeGoalRot = 25;
 
                 leftShoulderGoalPos = new Vector3(3.32f, -1.33f);
                 leftShoulderGoalRot = -75;
@@ -289,12 +294,12 @@ public class BossMovement : MonoBehaviour
                 rightElbowGoalRot = 30;
 
                 leftHipGoalPos = new Vector3(0, -2.17f);
-                leftHipGoalRot = 35;
-                leftKneeGoalRot = -60;
+                leftHipGoalRot = -13;
+                leftKneeGoalRot = -32;
 
-                rightHipGoalPos = new Vector3(-1.47f, -1.19f);
-                rightHipGoalRot = -60;
-                rightKneeGoalRot = 15;
+                rightHipGoalPos = new Vector3(-2.5f, -1.07f);
+                rightHipGoalRot = -75;
+                rightKneeGoalRot = 25;
                 moveTimer = .001f;
 
             }
@@ -332,12 +337,12 @@ public class BossMovement : MonoBehaviour
                 rightShoulderGoalPos = new Vector3(.53f, .49f);
 
                 leftHipGoalPos = new Vector3(0, -2.17f);
-                leftHipGoalRot = 35;
-                leftKneeGoalRot = -60;
+                leftHipGoalRot = -13;
+                leftKneeGoalRot = -32;
 
-                rightHipGoalPos = new Vector3(-1.47f, -1.19f);
-                rightHipGoalRot = -60;
-                rightKneeGoalRot = 15;
+                rightHipGoalPos = new Vector3(-2.5f, -1.07f);
+                rightHipGoalRot = -75;
+                rightKneeGoalRot = 25;
 
                 moveTimer = .0001f;
 
@@ -560,16 +565,16 @@ public class BossMovement : MonoBehaviour
         float hipWavePos = wave * .15f - .15f;
         float hipWaveRot = wave * 10;
 
-        rightHip.EaseToNewPosition(new Vector3(-1.61f, hipWavePos - 1), .0001f);
-        rightHip.EaseToNewRotation(hipWaveRot - 30, .0001f);
+        rightHip.EaseToNewPosition(new Vector3(-1.91f, hipWavePos - 1.47f), .0001f);
+        rightHip.EaseToNewRotation(hipWaveRot - 80, .0001f);
 
-        leftHip.EaseToNewPosition(new Vector3(.77f, hipWavePos - 1.45f), .0001f);
-        leftHip.EaseToNewRotation(hipWaveRot - 15f, .0001f);
+        leftHip.EaseToNewPosition(new Vector3(1f, hipWavePos - 2.03f), .0001f);
+        leftHip.EaseToNewRotation(hipWaveRot - 55f, .0001f);
 
         float kneeWave = wave * -15f;
 
-        rightKnee.EaseToNewRotation(kneeWave + 20f, .0001f);
-        leftKnee.EaseToNewRotation(kneeWave - 10, .0001f);
+        rightKnee.EaseToNewRotation(kneeWave + 75f, .0001f);
+        leftKnee.EaseToNewRotation(kneeWave + 40, .0001f);
 
         float bodyWave = wave * -.2f;
         baseSkeleton.EaseToNewPosition(new Vector3(0, bodyWave, 0), .0001f);
@@ -585,14 +590,14 @@ public class BossMovement : MonoBehaviour
         float offsetWave = Mathf.Sin((animWalkTimer + Mathf.PI) * 7);
 
         
-        float leftHipWave = wave * 25 - 5;
-        float rightHipWave = offsetWave * 25 - 15;
+        float leftHipWave = wave * 25 - 50;
+        float rightHipWave = offsetWave * 25 - 55;
 
         leftHip.EaseToNewRotation(leftHipWave, .0001f);
         rightHip.EaseToNewRotation(rightHipWave, .0001f);
 
-        float leftKneeWave = wave * 15 - 25;
-        float rightKneeWave = offsetWave * 15 + 20;
+        float leftKneeWave = wave * 15 + 40;
+        float rightKneeWave = offsetWave * 15 + 45;
 
         leftKnee.EaseToNewRotation(leftKneeWave, .0001f);
         rightKnee.EaseToNewRotation(rightKneeWave, .0001f);
@@ -610,6 +615,14 @@ public class BossMovement : MonoBehaviour
         rightElbow.EaseToNewRotation(rightElbowWave, .0001f);
         
         
+    }
+    private void AnimDeath()
+    {
+        animDeathTimer += Time.deltaTime;
+        if(animDeathTimer > 5)
+        {
+            GameManager.instance.StartEndCutscene();  
+        }
     }
     void ResetTimers(string currAnim = "none")
     {

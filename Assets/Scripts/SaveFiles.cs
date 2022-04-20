@@ -44,7 +44,8 @@ public class SaveFiles : MonoBehaviour
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "SaveData" + slotNum + ".dat");
         SaveData data = new SaveData();
-        data.playerPosition = pos;
+        data.playerPositionX = pos.x;
+        data.playerPositionY = pos.y;
         data.playerHealth = p.health;
         data.specialMeterCharge = p.specialMeter;
         data.currPlayerSpecial = p.currSpecial;
@@ -65,14 +66,16 @@ public class SaveFiles : MonoBehaviour
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "SaveData" + slotNum + ".dat", FileMode.Open);
             SaveData data = (SaveData)bf.Deserialize(file);
-            file.Close();
+            
 
             // Figure out what to load here
             currentLevel = data.currentLevel;
             currentSpecial = data.currPlayerSpecial;
             enemiesKilled = data.killCountEnemies;
+            file.Close();
             UpdateSlotData(slotNum);
         }
+        
     }
     public void LoadGame(int slotNum)
     {
@@ -82,7 +85,7 @@ public class SaveFiles : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "SaveData" + slotNum + ".dat", FileMode.Open);
             SaveData data = (SaveData)bf.Deserialize(file);
             file.Close();
-            playerPos = data.playerPosition;
+            playerPos = new Vector3(data.playerPositionX, data.playerPositionY);
             playerHealth = data.playerHealth;
             playerHasSpecial = data.playerHasSpecial;
             currentSpecial = data.currPlayerSpecial;
@@ -146,7 +149,8 @@ class SaveData
 {
     public int slotNumber;
 
-    public Vector3 playerPosition;
+    public float playerPositionX;
+    public float playerPositionY;
     public float specialMeterCharge;
     public bool playerHasSpecial;
     public string currPlayerSpecial;
