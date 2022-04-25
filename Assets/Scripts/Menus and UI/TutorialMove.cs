@@ -6,6 +6,7 @@ public class TutorialMove : MonoBehaviour
 {
 
     public Transform finalPos;
+    public string title;
     private Vector2 startPos;
     private Vector3 goalPos;
     // Start is called before the first frame update
@@ -18,11 +19,13 @@ public class TutorialMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (goalPos != transform.position)
         {
             transform.position = AnimMath.Ease(transform.position, goalPos, .001f);
         }
         if (Vector3.Distance(goalPos, transform.position) < .0001f) transform.position = goalPos;
+        */
     }
 
     /// <summary>
@@ -33,5 +36,10 @@ public class TutorialMove : MonoBehaviour
     {
         if (fromOrToStart) goalPos = finalPos.position;
         else goalPos = startPos;
+    }
+
+    public void SwitchOnOff(bool visibility)
+    {
+        gameObject.SetActive(visibility);
     }
 }

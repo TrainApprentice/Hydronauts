@@ -21,11 +21,11 @@ public class BossAI : MonoBehaviour
     public bool isAttackingShockwave = false;
     public bool isDead = false;
 
-    public int health = 100;
+    public float health = 200;
 
     private BossMovement mover;
     private Transform shockwavePos;
-    private float timeBetweenAttacks = 10f;
+    private float timeBetweenAttacks = 5f;
     private int currPhase = 1;
     private int flamePattern = 1;
     private float fireAttackTimer = 2f;
@@ -59,7 +59,6 @@ public class BossAI : MonoBehaviour
                 if (currPhase == 1)
                 {
                     float randAttack = Random.Range(0f, 1f);
-                    print(randAttack);
 
                     if (randAttack < .4f)
                     {
@@ -152,13 +151,13 @@ public class BossAI : MonoBehaviour
         }
         
     }
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(float damage)
     {
         health -= damage;
         healthController.SetCurrentHealth(health);
 
-        if (health <= 50) currPhase = 2;
-        if (health <= 0) isDead = true; ;
+        if (health <= 100) currPhase = 2;
+        if (health <= 0) isDead = true; 
     }
 
     public void FlamethrowerAttack()

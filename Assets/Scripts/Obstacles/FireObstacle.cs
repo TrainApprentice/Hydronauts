@@ -23,6 +23,7 @@ public class FireObstacle : MonoBehaviour
         if (currHealth < 0)
         {
             PlayerMain player = FindObjectOfType<PlayerMain>();
+            GameManager.instance.HideDousingTutorial();
             player.ApplyDamage(-1);
             Destroy(gameObject);
         }

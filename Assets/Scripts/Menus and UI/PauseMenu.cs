@@ -50,7 +50,7 @@ public class PauseMenu : MonoBehaviour
         int kills = GameManager.instance.totalKills;
         int encounter = GameManager.instance.maxEncounter;
         int level = (GameManager.instance.hasWon) ? 1 : 0;
-        Vector3 position = (encounter > 0) ? GameManager.instance.encounterPos[encounter - 1].position - new Vector3(3, 0) : new Vector3(-5, -.5f);
+        Vector3 position = (encounter > 0) ? GameManager.instance.encounterPos[encounter - 1].transform.position - new Vector3(3, 0) : new Vector3(-5, -.5f);
         SaveFiles.instance.SaveGame(player, position, currSaveSlot, kills, level, encounter);
         confirmOverwrite.SetActive(false);
         SaveFiles.instance.UpdateAllSlots();
@@ -112,7 +112,6 @@ public class PauseMenu : MonoBehaviour
         
 
         SetButtonFunctions();
-        print("Bing");
         pauseMenu.SetActive(false);
         saveSlots.SetActive(false);
         quitWarning.SetActive(false);

@@ -8,7 +8,7 @@ public class BossUI : MonoBehaviour
 
     private Transform healthBar;
     private float prevHealth = 0;
-    private int currHealth = 100;
+    private float currHealth = 200;
     private float introTimer = 0;
     // Start is called before the first frame update
     void Start()
@@ -29,13 +29,13 @@ public class BossUI : MonoBehaviour
                 prevHealth = currHealth;
             }
             float barWidth = AnimMath.Lerp(prevHealth, currHealth, introTimer);
-            healthBar.localScale = new Vector3(barWidth / 100, 1, 1);
+            healthBar.localScale = new Vector3(barWidth / 200, 1, 1);
         }
         if(currHealth < prevHealth)
         {
             prevHealth = AnimMath.Ease(prevHealth, currHealth, .01f);
             if (prevHealth - currHealth < .01f) prevHealth = currHealth;
-            healthBar.localScale = new Vector3(prevHealth / 100, 1, 1);
+            healthBar.localScale = new Vector3(prevHealth / 200, 1, 1);
         }
         if (prevHealth <= .1f && currHealth <= 0)
         {
@@ -44,7 +44,7 @@ public class BossUI : MonoBehaviour
         
     }
 
-    public void SetCurrentHealth(int num)
+    public void SetCurrentHealth(float num)
     {
         currHealth = num;
     }

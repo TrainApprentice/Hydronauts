@@ -619,9 +619,95 @@ public class BossMovement : MonoBehaviour
     private void AnimDeath()
     {
         animDeathTimer += Time.deltaTime;
-        if(animDeathTimer > 5)
+        
+        if(animDeathTimer > 1)
         {
-            GameManager.instance.StartEndCutscene();  
+            float leftShoulderGoalRot = leftShoulder.startRot.eulerAngles.z;
+            float rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+            float leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
+            float rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
+            float leftHipGoalRot = leftHip.startRot.eulerAngles.z;
+            float rightHipGoalRot = rightHip.startRot.eulerAngles.z;
+            float leftKneeGoalRot = leftKnee.startRot.eulerAngles.z;
+            float rightKneeGoalRot = rightKnee.startRot.eulerAngles.z;
+            float baseBodyGoalRot = baseBody.startRot.eulerAngles.z;
+            float baseSkeletonGoalRot = baseSkeleton.startRot.eulerAngles.z;
+
+            Vector3 leftShoulderGoalPos = leftShoulder.startPos;
+            Vector3 rightShoulderGoalPos = rightShoulder.startPos;
+            Vector3 leftHipGoalPos = leftHip.startPos;
+            Vector3 rightHipGoalPos = rightHip.startPos;
+            Vector3 baseBodyGoalPos = baseBody.startPos;
+            Vector3 baseSkeletonGoalPos = baseSkeleton.startPos;
+
+            float moveTimer = 0;
+
+            if (animDeathTimer < 2.5f)
+            {
+                baseBodyGoalPos = new Vector3(1.6f, -2.12f, 0);
+                baseSkeletonGoalPos = new Vector3(1.9f, -1.71f);
+
+                leftShoulderGoalRot = -80;
+                leftElbowGoalRot = -65;
+                rightShoulderGoalRot = -10;
+                rightElbowGoalRot = -50;
+
+                leftHipGoalRot = -55;
+                leftKneeGoalRot = -30;
+                rightHipGoalRot = -83;
+                rightKneeGoalRot = 2;
+
+                moveTimer = .01f;
+            }
+            else
+            {
+                GameManager.instance.StartEndCutscene();
+                baseSkeletonGoalPos = new Vector3(4, -4);
+                baseSkeletonGoalRot = -90;
+
+                baseBodyGoalPos = new Vector3(3.85f, -4.3f);
+                baseBodyGoalRot = -90;
+
+                rightShoulderGoalPos = new Vector3(2.6f, 3.7f);
+                rightShoulderGoalRot = 20;
+                rightElbowGoalRot = -20;
+
+                leftShoulderGoalRot = -60;
+                leftElbowGoalRot = -110;
+
+                leftKneeGoalRot = 50;
+
+                rightHipGoalPos = new Vector3(.15f, -3.77f);
+                rightKneeGoalRot = 35;
+                moveTimer = .01f;
+            }
+
+            baseSkeleton.EaseToNewPosition(baseSkeletonGoalPos, moveTimer);
+            baseSkeleton.EaseToNewRotation(baseSkeletonGoalRot, moveTimer);
+
+            baseBody.EaseToNewPosition(baseBodyGoalPos, moveTimer);
+            baseBody.EaseToNewRotation(baseBodyGoalRot, moveTimer);
+
+            leftHip.EaseToNewPosition(leftHipGoalPos, moveTimer);
+            leftHip.EaseToNewRotation(leftHipGoalRot, moveTimer);
+
+            leftKnee.EaseToNewRotation(leftKneeGoalRot, moveTimer);
+
+            rightHip.EaseToNewPosition(rightHipGoalPos, moveTimer);
+            rightHip.EaseToNewRotation(rightHipGoalRot, moveTimer);
+
+            rightKnee.EaseToNewRotation(rightKneeGoalRot, moveTimer);
+
+            leftShoulder.EaseToNewPosition(leftShoulderGoalPos, moveTimer);
+            leftShoulder.EaseToNewRotation(leftShoulderGoalRot, moveTimer);
+
+            leftElbow.EaseToNewRotation(leftElbowGoalRot, moveTimer);
+
+            rightShoulder.EaseToNewPosition(rightShoulderGoalPos, moveTimer);
+            rightShoulder.EaseToNewRotation(rightShoulderGoalRot, moveTimer);
+
+            rightElbow.EaseToNewRotation(rightElbowGoalRot, moveTimer);
+
         }
     }
     void ResetTimers(string currAnim = "none")

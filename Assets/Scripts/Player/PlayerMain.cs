@@ -65,12 +65,6 @@ public class PlayerMain : MonoBehaviour
 
     private GameObject shadow;
     private GameObject currDouse;
-    private const int IDLE_STATE = 0;
-    private const int WALK_STATE = 1;
-    private const int ATTACK_STATE = 2;
-    private const int JUMP_STATE = 3;
-    private const int HIT_STATE = 4;
-    private const int SPECIAL_STATE = 5;
 
     // Start is called before the first frame update
     void Start()
@@ -78,10 +72,7 @@ public class PlayerMain : MonoBehaviour
         shadow = transform.Find("Shadow").gameObject;
 
         cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();
-        // If there's a save, load those stats
-        // Otherwise, reset to default values
-
-        //Reset(false);
+        
     }
 
     // Update is called once per frame
@@ -119,14 +110,16 @@ public class PlayerMain : MonoBehaviour
         }
         else specialMeter = 0;
 
-        if (canMove && !isInCutscene)
+        if (!isInCutscene)
         {
-            movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical") * .75f;
+            if (canMove)
+            {
+                movement.x = (Input.GetAxisRaw("Vertical") > 0) ? Input.GetAxisRaw("Horizontal") + .15f : (Input.GetAxisRaw("Vertical") < 0) ? Input.GetAxisRaw("Horizontal") - .15f : Input.GetAxisRaw("Horizontal");
+                movement.y = Input.GetAxisRaw("Vertical") * .75f;
+            }
+            else movement = Vector2.zero;
         }
-        else if(!isInCutscene) movement = Vector2.zero;
-        
-
+        else rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
         if (movement != Vector2.zero && !isWalking && specialDuration <= 0)
         {
@@ -153,6 +146,7 @@ public class PlayerMain : MonoBehaviour
         if(Input.GetKeyDown("q"))
         {
             ActivateSpecial();
+            GameManager.instance.HideSpecialTutorial();
         }
         isDousing = Input.GetKey("r");
         isBlocking = Input.GetKey("left ctrl") && canBlock;
@@ -194,27 +188,9 @@ public class PlayerMain : MonoBehaviour
 
         if(isBlocking)
         {
-            //sprite.color = new Color(.8f, .8f, .8f);
+            
         }
         
-
-        // DEBUG ONLY
-        /*
-        if (Input.GetKeyDown("l"))
-        {
-            cam.Shake(.1f, 1);
-        }
-        if (Input.GetKeyDown("b"))
-        {
-            currSpecial = "blast";
-            specialMeter = maxSpecialMeter;
-        }
-        if (Input.GetKeyDown("r"))
-        {
-            currSpecial = "sprinkler";
-            specialMeter = maxSpecialMeter;
-        }
-        */
         if (health <= 0) isDead = true;
 
     }
@@ -225,9 +201,78 @@ public class PlayerMain : MonoBehaviour
     {
         transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
       
-        if (Input.GetAxisRaw("Horizontal") < 0) transform.localScale = new Vector3(-1f, 1f, 1);
-        if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
+        if(!isInCutscene)
+        {
+            if (Input.GetAxisRaw("Horizontal") < 0) transform.localScale = new Vector3(-1f, 1f, 1);
+            if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
+        }
         
+        
+    }
+
+    public void Reset(bool hasData = true)
+    {
+
+        isDead = false;
+        if (!hasData)
+        {
+            health = maxHealth;
+            hasSpecial = false;
+            specialDuration = 0;
+            specialMeter = 0;
+        }
+
+    }
+    public void ApplyDamage(int damage)
+    {
+        if (damage > 0)
+        {
+            if (!isInvincible && perfectBlockTimer == 0)
+            {
+                health -= (isBlocking) ? damage / 2 : damage;
+                isInvincible = true;
+                iFrames = 2;
+            }
+        }
+        else
+        {
+            health -= damage;
+            if (health >= maxHealth) health = maxHealth;
+        }
+
+    }
+
+    public void SetMovementInCutscene(string direction)
+    {
+        if (!isInCutscene) return;
+
+        switch(direction)
+        {
+            case "left":
+                movement.x = -1;
+                movement.y = 0;
+                transform.localScale = new Vector3(-1, 1, 1);
+                break;
+            case "right":
+                movement.x = 1;
+                movement.y = 0;
+                transform.localScale = new Vector3(1, 1, 1);
+                break;
+            case "up":
+                movement.x = .15f;
+                movement.y = 1;
+                break;
+            case "down":
+                movement.x = -.15f;
+                movement.y = -1;
+                break;
+            default:
+                movement.x = 0;
+                movement.y = 0;
+                break;
+
+        }
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -303,52 +348,7 @@ public class PlayerMain : MonoBehaviour
         
     }
 
-    public void ApplyDamage(int damage)
-    {
-        if(damage > 0)
-        {
-            if (!isInvincible && perfectBlockTimer == 0)
-            {
-                health -= (isBlocking) ? damage / 2 : damage;
-                isInvincible = true;
-                iFrames = 2;
-            }
-        }
-        else
-        {
-            health -= damage;
-            if (health >= maxHealth) health = maxHealth;
-        }
-        
-    }
 
-    
-    private void StateMachine()
-    {
-        switch(playerState)
-        {
-            case IDLE_STATE:
-                canAttack = true;
-                break;
-            case WALK_STATE:
-                canAttack = true;
-                break;
-            case ATTACK_STATE:
-                canAttack = true;
-                break;
-            case JUMP_STATE:
-                canAttack = true;
-                break;
-            case HIT_STATE:
-                canAttack = false;
-                break;
-            case SPECIAL_STATE:
-                canAttack = false;
-                break;
-            default:
-                break;
-        }
-    }
     private void AttackInputs()
     {
         if (comboTimer > 0) comboTimer -= Time.deltaTime;
@@ -366,20 +366,9 @@ public class PlayerMain : MonoBehaviour
         if(Input.GetButtonDown("Fire1") && canAttack)
         {
             comboTimer = .5f;
-            if(playerState == JUMP_STATE)
-            {
-                // Jump Attack (Light)
-                comboSequence.Add(3);
-                canAttack = false;
-                attackCooldown = .2f;
-            }
-            else
-            {
-                //Left Punch (Light Attack)
-                comboSequence.Add(1);
-                canAttack = false;
-                attackCooldown = .2f;
-            }
+            comboSequence.Add(1);
+            canAttack = false;
+            attackCooldown = .2f;
             CheckCombos("light");
             rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
@@ -388,20 +377,10 @@ public class PlayerMain : MonoBehaviour
         if(Input.GetButtonDown("Fire2") && canAttack)
         {
             comboTimer = .5f;
-            if (playerState == JUMP_STATE)
-            {
-                // Jump Attack (Heavy)
-                comboSequence.Add(4);
-                canAttack = false;
-                attackCooldown = .2f;
-            }
-            else
-            {
-                //Right Punch (Heavy Attack)
-                comboSequence.Add(2);
-                canAttack = false;
-                attackCooldown = .2f;
-            }
+            //Right Punch (Heavy Attack)
+            comboSequence.Add(2);
+            canAttack = false;
+            attackCooldown = .2f;
             CheckCombos("heavy");
             rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
@@ -441,19 +420,6 @@ public class PlayerMain : MonoBehaviour
         
         
     }
-    public void Reset(bool hasData = true)
-    {
-        
-        isDead = false;
-        if(!hasData)
-        {
-            health = maxHealth;
-            hasSpecial = false;
-            specialDuration = 0;
-            specialMeter = 0;
-        }
-        
-    }
 
     private void ActivateSpecial()
     {
@@ -463,7 +429,7 @@ public class PlayerMain : MonoBehaviour
             {
                 case "blast":
                     specialMeter -= 8f;
-                    specialDuration = 1f;
+                    specialDuration = 2.5f;
                     GameObject newBlast = Instantiate(blastAttack, transform.position, Quaternion.identity);
                     if (transform.localScale.x < 0) newBlast.GetComponent<Blast>().flipDirection = true;
                     moveSpeed = 2f;

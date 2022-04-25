@@ -14,10 +14,7 @@ public class GameManager : MonoBehaviour
     public Transform bossSpawn;
     public int killCount = 0;
     public BossUI bossHealthBar;
-    public Transform[] encounterPos = new Transform[4];
-    public TutorialMove movementTut, combatTut, specialTut;
-    public Transform powerSpawn1, powerSpawn2;
-    public GameObject encounter1, encounter2, encounter3;
+    public EncounterMarker[] encounterPos = new EncounterMarker[4];
 
     [HideInInspector]
     public PlayerMain player;
@@ -34,11 +31,16 @@ public class GameManager : MonoBehaviour
     private BossAI currBoss;
     private List<EnemyMain> enemies = new List<EnemyMain>();
 
+    private TutorialMove movementTut, combatTut, specialTut, dousingTut;
+    private PowerPos[] powerSpawn = new PowerPos[2];
+    private EncounterBox encounter1, encounter2, encounter3;
+
     private bool inEncounter = false;
     private int currEncounter = 0;
     private int killGoal = 0;
     private int currEnemies = 0;
     private float enemySpawnCooldown = .3f;
+    private float cutsceneTimer = 0;
 
     void Awake()
     {
@@ -53,7 +55,7 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
             ResetGameStats();
-            print("Thing");
+            
         }
     }
 
@@ -72,7 +74,12 @@ public class GameManager : MonoBehaviour
             player.Reset();
             
         }
-
+        if (player.isInCutscene) cutsceneTimer += Time.deltaTime;
+        if(cutsceneTimer > 4f && SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1"))
+        {
+            SceneManager.LoadScene("EndScene");
+            player.Reset();
+        }
         
     }
 
@@ -133,8 +140,9 @@ public class GameManager : MonoBehaviour
     }
     public void StartEndCutscene()
     {
+        if (player.isInCutscene) return;
         player.isInCutscene = true;
-        SceneManager.LoadScene("EndScene");
+        player.SetMovementInCutscene("left");
     }
     private void GoToGameOver()
     {
@@ -165,8 +173,8 @@ public class GameManager : MonoBehaviour
         {
             case 1:
                 killGoal = 5;
-                movementTut.SetNewPosition(false);
-                combatTut.SetNewPosition(true);
+                movementTut.SwitchOnOff(false);
+                combatTut.SwitchOnOff(true);
                 break;
             case 2:
                 killGoal = 10;
@@ -180,16 +188,27 @@ public class GameManager : MonoBehaviour
                 break;
         }
         SetWalls(num);
-        cam.SetNewTarget(encounterPos[num-1].position);
+        cam.SetNewTarget(encounterPos[num-1].transform.position);
         inEncounter = true;
     }
     public void ShowSpecialTutorial()
     {
-        specialTut.SetNewPosition(true);
+        specialTut.SwitchOnOff(true);
+    }
+    public void HideSpecialTutorial()
+    {
+        specialTut.SwitchOnOff(false);
+    }
+    public void ShowDousingTutorial()
+    {
+        dousingTut.SwitchOnOff(true);
+    }
+    public void HideDousingTutorial()
+    {
+        dousingTut.SwitchOnOff(false);
     }
     public void EndEncounter()
     {
-        
         killCount = 0;
         killGoal = 0;
         currEnemies = 0;
@@ -199,7 +218,11 @@ public class GameManager : MonoBehaviour
         Destroy(rWall);
         Destroy(lWall);
         cam.SetNewTarget(player.transform.position);
-        if (maxEncounter == 1) combatTut.SetNewPosition(false);
+        if (maxEncounter == 1)
+        {
+            ShowDousingTutorial();
+            combatTut.SwitchOnOff(false);
+        }
     }
 
     public void ResetGameStats()
@@ -210,6 +233,13 @@ public class GameManager : MonoBehaviour
         baseBoss = Resources.Load<GameObject>("Prefab/Boss");
         baseWall = Resources.Load<GameObject>("Prefab/Wall");
         player = FindObjectOfType<PlayerMain>();
+        encounterPos = FindObjectsOfType<EncounterMarker>();
+        powerSpawn = FindObjectsOfType<PowerPos>();
+        SetupEncounters();
+        FindTutorials();
+        bossHealthBar = FindObjectOfType<BossUI>();
+        bossHealthBar.gameObject.SetActive(false);
+        cutsceneTimer = 0;
 
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         GetComponent<PauseMenu>().FindMenuElements();
@@ -224,7 +254,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                movementTut.SetNewPosition(true);
+                movementTut.SwitchOnOff(true);
                 SpawnPowerups();
                 player.Reset(false);
             }
@@ -232,7 +262,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            movementTut.SetNewPosition(true);
+            movementTut.SwitchOnOff(true);
             SpawnPowerups();
             player.Reset(false);
         }
@@ -250,9 +280,9 @@ public class GameManager : MonoBehaviour
         totalKills = SaveFiles.instance.enemiesKilled;
         maxEncounter = SaveFiles.instance.lastEncounter;
 
-        if (maxEncounter > 0) encounter1.SetActive(false);
-        if (maxEncounter > 1) encounter2.SetActive(false);
-        if (maxEncounter > 2) encounter3.SetActive(false);
+        if (maxEncounter > 0) encounter1.gameObject.SetActive(false);
+        if (maxEncounter > 1) encounter2.gameObject.SetActive(false);
+        if (maxEncounter > 2) encounter3.gameObject.SetActive(false);
 
         if (!player.hasSpecial) SpawnPowerups();
     }
@@ -268,10 +298,10 @@ public class GameManager : MonoBehaviour
         }
         
 
-        GameObject p1 = Instantiate(powerupBase, powerSpawn1);
+        GameObject p1 = Instantiate(powerupBase, powerSpawn[0].transform);
         p1.GetComponent<PowerupPickup>().powerupType = 1;
 
-        GameObject p2 = Instantiate(powerupBase, powerSpawn2);
+        GameObject p2 = Instantiate(powerupBase, powerSpawn[1].transform);
         p2.GetComponent<PowerupPickup>().powerupType = 2;
     }
 
@@ -298,9 +328,60 @@ public class GameManager : MonoBehaviour
 
         }
     }
-    private void OnDestroy()
+
+    private void FindTutorials()
     {
-        
+        TutorialMove[] temp = FindObjectsOfType<TutorialMove>();
+
+        foreach(TutorialMove t in temp)
+        {
+            switch (t.title)
+            {
+                case "movement":
+                    movementTut = t;
+                    break;
+                case "combat":
+                    combatTut = t;
+                    break;
+                case "special":
+                    specialTut = t;
+                    break;
+                case "dousing":
+                    dousingTut = t;
+                    break;
+            }
+            t.SwitchOnOff(false);
+        }
+    }
+    private void SetupEncounters()
+    {
+        EncounterMarker[] temp = new EncounterMarker[encounterPos.Length];
+
+        foreach (EncounterMarker e in encounterPos)
+        {
+            temp[e.encounterNum - 1] = e;
+        }
+        encounterPos = temp;
+
+        EncounterBox[] temp2 = FindObjectsOfType<EncounterBox>();
+
+        foreach (EncounterBox e in temp2)
+        {
+            switch(e.boxNum)
+            {
+                case 1:
+                    encounter1 = e;
+                    break;
+                case 2:
+                    encounter2 = e;
+                    break;
+                case 3:
+                    encounter3 = e;
+                    break;
+
+            }
+        }
+
     }
 
 }

@@ -1083,7 +1083,8 @@ MonoBehaviour:
   isAttackingSlam: 0
   isAttackingRush: 0
   isAttackingShockwave: 0
-  health: 100
+  isDead: 0
+  health: 200
 --- !u!114 &4367447946886176415
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+
 
 public class SaveFiles : MonoBehaviour
 {
@@ -32,12 +34,19 @@ public class SaveFiles : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += RunOnSceneChange;
         }
     }
     private void Start()
     {
         UpdateAllSlots();
+        
     }
+    private void RunOnSceneChange(Scene s, LoadSceneMode mode)
+    {
+        UpdateAllSlots();
+    }
+    
 
     public void SaveGame(PlayerMain p, Vector3 pos, int slotNum, int killCount, int levelNum, int lastEncounter)
     {
@@ -115,6 +124,7 @@ public class SaveFiles : MonoBehaviour
     public void UpdateAllSlots()
     {
         SaveSlotDisplay[] temp = FindObjectsOfType<SaveSlotDisplay>();
+        if (temp.Length <= 0) return;
         foreach (SaveSlotDisplay s in temp)
         {
             LoadSlotDisplay(s.slot);
