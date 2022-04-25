@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     private PowerPos[] powerSpawn = new PowerPos[2];
     private EncounterBox encounter1, encounter2, encounter3;
 
+    private bool seenMoveTut, seenCombatTut, seenSpecialTut, seenDousingTut;
     private bool inEncounter = false;
     private int currEncounter = 0;
     private int killGoal = 0;
@@ -174,7 +175,11 @@ public class GameManager : MonoBehaviour
             case 1:
                 killGoal = 5;
                 movementTut.SwitchOnOff(false);
-                combatTut.SwitchOnOff(true);
+                if (!seenCombatTut)
+                {
+                    combatTut.SwitchOnOff(true);
+                    seenCombatTut = true;
+                }
                 break;
             case 2:
                 killGoal = 10;
@@ -193,7 +198,12 @@ public class GameManager : MonoBehaviour
     }
     public void ShowSpecialTutorial()
     {
-        specialTut.SwitchOnOff(true);
+        if(!seenSpecialTut)
+        {
+            specialTut.SwitchOnOff(true);
+            seenSpecialTut = true;
+        }
+        
     }
     public void HideSpecialTutorial()
     {
@@ -201,7 +211,12 @@ public class GameManager : MonoBehaviour
     }
     public void ShowDousingTutorial()
     {
-        dousingTut.SwitchOnOff(true);
+        if(!seenDousingTut)
+        {
+            dousingTut.SwitchOnOff(true);
+            seenDousingTut = true;
+        }
+        
     }
     public void HideDousingTutorial()
     {
@@ -254,7 +269,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                movementTut.SwitchOnOff(true);
+                if (!seenMoveTut)
+                {
+                    movementTut.SwitchOnOff(true);
+                    seenMoveTut = true;
+                }
                 SpawnPowerups();
                 player.Reset(false);
             }
@@ -262,7 +281,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            movementTut.SwitchOnOff(true);
+            if (!seenMoveTut)
+            {
+                movementTut.SwitchOnOff(true);
+                seenMoveTut = true;
+            }
             SpawnPowerups();
             player.Reset(false);
         }
@@ -279,10 +302,28 @@ public class GameManager : MonoBehaviour
 
         totalKills = SaveFiles.instance.enemiesKilled;
         maxEncounter = SaveFiles.instance.lastEncounter;
-
-        if (maxEncounter > 0) encounter1.gameObject.SetActive(false);
-        if (maxEncounter > 1) encounter2.gameObject.SetActive(false);
-        if (maxEncounter > 2) encounter3.gameObject.SetActive(false);
+        seenSpecialTut = player.hasSpecial;
+        if (maxEncounter > 0)
+        {
+            encounter1.gameObject.SetActive(false);
+            seenCombatTut = true;
+            seenMoveTut = true;
+            seenDousingTut = false;
+        }
+        if (maxEncounter > 1)
+        {
+            encounter2.gameObject.SetActive(false);
+            seenCombatTut = true;
+            seenMoveTut = true;
+            seenDousingTut = true;
+        }
+        if (maxEncounter > 2)
+        {
+            encounter3.gameObject.SetActive(false);
+            seenCombatTut = true;
+            seenMoveTut = true;
+            seenDousingTut = true;
+        }
 
         if (!player.hasSpecial) SpawnPowerups();
     }

@@ -178,6 +178,7 @@ public class PlayerMain : MonoBehaviour
         {
             sprite.color = new Color(1, 1, 1, .6f);
             iFrames -= Time.deltaTime;
+            if (iFrames < 1.5f) AnimUpdate("damaged", false);
         }
         else
         {
@@ -185,11 +186,7 @@ public class PlayerMain : MonoBehaviour
             iFrames = 0;
             isInvincible = false;
         }
-
-        if(isBlocking)
-        {
-            
-        }
+        AnimUpdate("blocking", isBlocking);
         
         if (health <= 0) isDead = true;
 
@@ -232,6 +229,7 @@ public class PlayerMain : MonoBehaviour
                 health -= (isBlocking) ? damage / 2 : damage;
                 isInvincible = true;
                 iFrames = 2;
+                AnimUpdate("damaged");
             }
         }
         else
@@ -451,7 +449,7 @@ public class PlayerMain : MonoBehaviour
     private void AnimUpdate(string varUpdate, bool setVal = true)
     {
         masterAnim.SetBool(varUpdate, setVal);
-        if(varUpdate != "walking") animResetTimer = .1f;
+        //if(varUpdate != "walking") animResetTimer = .1f;
 
         
     }
