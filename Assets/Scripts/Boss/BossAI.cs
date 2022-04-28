@@ -63,7 +63,7 @@ public class BossAI : MonoBehaviour
                 {
                     float randAttack = Random.Range(0f, 1f);
 
-                    if (randAttack < 1f)
+                    if (randAttack < .4f)
                     {
                         FlamethrowerAttack();
                         fireAttackTimer = 2f;

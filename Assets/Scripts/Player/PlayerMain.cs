@@ -367,7 +367,7 @@ public class PlayerMain : MonoBehaviour
         {
             comboTimer = 0;
             comboSequence.Clear();
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            //rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
         if(!canAttack)
         {
@@ -381,7 +381,7 @@ public class PlayerMain : MonoBehaviour
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("light");
-            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+            //rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
         }
 
@@ -393,7 +393,7 @@ public class PlayerMain : MonoBehaviour
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("heavy");
-            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+            //rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
 
