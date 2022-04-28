@@ -9,7 +9,9 @@ public class GameOver : MonoBehaviour
     public GameObject levelSlots;
     public void RestartLevel()
     {
+        
         SceneManager.LoadScene("Level1");
+        GameManager.instance.ResetGameStats();
     }
 
     public void ShowLevelSlots()
@@ -28,8 +30,9 @@ public class GameOver : MonoBehaviour
     public void LoadGame(int slotNum)
     {
         // Replace with load game
-        SceneManager.LoadScene("Level1");
         SaveFiles.instance.LoadGame(slotNum);
+        SceneManager.LoadScene("Level1");
+        
     }
     public void ShowQuitWarning()
     {

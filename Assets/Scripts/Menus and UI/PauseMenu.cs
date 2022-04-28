@@ -31,11 +31,13 @@ public class PauseMenu : MonoBehaviour
     public void ShowSaveSlots()
     {
         saveSlots.SetActive(true);
+        pauseMenu.SetActive(false);
         SaveFiles.instance.UpdateAllSlots();
     }
     public void HideSaveSlots()
     {
         saveSlots.SetActive(false);
+        pauseMenu.SetActive(true);
         confirmOverwrite.SetActive(false);
     }
     public void SaveGame()
@@ -61,20 +63,23 @@ public class PauseMenu : MonoBehaviour
         // Pop up Are You Sure?
         // Unsaved progress will be lost
         menuWarning.SetActive(true);
-        
+        pauseMenu.SetActive(false);
     }
     public void HideMenuWarning()
     {
         menuWarning.SetActive(false);
+        pauseMenu.SetActive(true);
     }
 
     public void ShowConfirmOverwrite()
     {
         confirmOverwrite.SetActive(true);
+        saveSlots.SetActive(false);
     }
     public void HideConfirmOverwrite()
     {
         confirmOverwrite.SetActive(false);
+        saveSlots.SetActive(true);
     }
 
     public void BackToMenu()
@@ -88,11 +93,13 @@ public class PauseMenu : MonoBehaviour
         // Pop up Are You Sure?
         // Unsaved progress will be lost
         quitWarning.SetActive(true);
+        pauseMenu.SetActive(false);
     }
 
     public void HideQuitWarning()
     {
         quitWarning.SetActive(false);
+        pauseMenu.SetActive(true);
     }
 
     // Also for Game Over

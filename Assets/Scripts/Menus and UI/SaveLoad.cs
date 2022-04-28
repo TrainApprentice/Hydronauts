@@ -46,6 +46,6 @@ public class SaveLoad : MonoBehaviour
         SaveFiles.instance.DeleteData(currSlotSelection);
         HideDeleteWarning();
         HideLoadDelete();
-
+        SaveFiles.instance.UpdateAllSlots();
     }
 }

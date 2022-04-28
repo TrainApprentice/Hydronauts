@@ -10,7 +10,9 @@ public class PlayerUI : MonoBehaviour
     public GameObject healthBar;
     public GameObject specialMeterNeedle;
 
-    private List<Image> bars = new List<Image>();
+    public Image currSpecial;
+    public Sprite blast, sprinkler;
+    
 
     private void Start()
     {
@@ -21,6 +23,7 @@ public class PlayerUI : MonoBehaviour
     {
         UpdateSpecialMeter();
         UpdateHealth();
+        CheckCurrentSpecial();
     }
 
     public void UpdateHealth()
@@ -43,5 +46,23 @@ public class PlayerUI : MonoBehaviour
         Quaternion goalRot = Quaternion.Euler(0, 0, angleZ);
 
         specialMeterNeedle.transform.localRotation = (p!= 0) ? AnimMath.Ease(specialMeterNeedle.transform.localRotation, goalRot, .001f, false) : goalRot;
+    }
+
+    void CheckCurrentSpecial()
+    {
+        currSpecial.gameObject.SetActive(true);
+        if (playerRef.hasSpecial)
+        {
+            switch (playerRef.currSpecial)
+            {
+                case "blast":
+                    currSpecial.sprite = blast;
+                    break;
+                case "sprinkler":
+                    currSpecial.sprite = sprinkler;
+                    break;
+            }
+        }
+        else currSpecial.gameObject.SetActive(false);
     }
 }

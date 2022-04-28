@@ -27,32 +27,38 @@ public class Blast : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        
         if(collision.CompareTag("Enemy"))
         {
             collision.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
         }
         if(collision.CompareTag("Boss"))
         {
-            collision.GetComponentInParent<BossAI>().ApplyDamage(damageAmt);
+            collision.GetComponentInParent<BossAI>().ApplyDamage(damageAmt * 3);
+            
         }
         if (collision.CompareTag("Fire"))
         {
-            collision.GetComponent<FireObstacle>().ApplyDamage(damageAmt);
+            if (collision.GetComponent<FireObstacle>()) collision.GetComponent<FireObstacle>().ApplyDamage(damageAmt);
+            else if (collision.GetComponent<FireProjectile>()) Destroy(collision.gameObject);
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
+        
         if (collision.CompareTag("Enemy"))
         {
             collision.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
         }
         if (collision.CompareTag("Boss"))
         {
-            collision.GetComponentInParent<BossAI>().ApplyDamage(damageAmt);
+            collision.GetComponentInParent<BossAI>().ApplyDamage(damageAmt * 3);
+            
         }
         if (collision.CompareTag("Fire"))
         {
-            collision.GetComponent<FireObstacle>().ApplyDamage(damageAmt);
+            if (collision.GetComponent<FireObstacle>()) collision.GetComponent<FireObstacle>().ApplyDamage(damageAmt);
+            else if (collision.GetComponent<FireProjectile>()) Destroy(collision.gameObject);
         }
     }
 }

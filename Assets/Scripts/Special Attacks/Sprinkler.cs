@@ -50,11 +50,12 @@ public class Sprinkler : MonoBehaviour
         }
         if (collision.CompareTag("Boss"))
         {
-            collision.GetComponentInParent<BossAI>().ApplyDamage((int)damageAmt);
+            collision.GetComponentInParent<BossAI>().ApplyDamage(damageAmt * 4);
         }
         if (collision.CompareTag("Fire"))
         {
-            collision.GetComponent<FireObstacle>().ApplyDamage(1);
+            if (collision.GetComponent<FireObstacle>()) collision.GetComponent<FireObstacle>().ApplyDamage(damageAmt);
+            else if (collision.GetComponent<FireProjectile>()) Destroy(collision.gameObject);
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -65,10 +66,6 @@ public class Sprinkler : MonoBehaviour
             collision.gameObject.GetComponent<EnemyMain>().ApplyDamage(damageAmt);
         }
     }
-    void FadeColor()
-    {
-        Color thing = new Color(image.color.r, image.color.g, image.color.b, damageInterval * 3);
-        image.color = thing;
-    }
+    
 
 }

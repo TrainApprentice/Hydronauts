@@ -256,10 +256,14 @@ public class GameManager : MonoBehaviour
         bossHealthBar.gameObject.SetActive(false);
         cutsceneTimer = 0;
 
+        currEnemies = 0;
+        enemySpawnCooldown = .3f;
+
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         GetComponent<PauseMenu>().FindMenuElements();
-        
-        if(SaveFiles.instance)
+        ResumeGame();
+
+        if (SaveFiles.instance)
         {
             if (SaveFiles.instance.CheckDataInSlot(SaveFiles.instance.chosenSlot))
             {

@@ -530,24 +530,37 @@ public class BossMovement : MonoBehaviour
     {
         if(flameAttackDuration == 0) controller.isAttackingFire = true;
         flameAttackDuration += Time.deltaTime;
-        if(currFlamePattern == 1)
-        {
-            
-        }
-        else if(currFlamePattern == 2)
-        {
-            
-        }
-        else if(currFlamePattern == 3)
-        {
-            
-        }
         if(flameAttackDuration > 2 || !controller.isAttackingFire)
         {
             walkTimer = 0;
             doingFlames = false;
             SetNewLocation(prevLocation);
             flameAttackDuration = 0;
+        }
+        else
+        {
+            float rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
+            float leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
+            float rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+            if (currFlamePattern == 1)
+            {
+                leftElbowGoalRot = 10;
+            }
+            else if (currFlamePattern == 2)
+            {
+                rightShoulderGoalRot = 0;
+                rightElbowGoalRot = -15;
+            }
+            else if (currFlamePattern == 3)
+            {
+                rightShoulderGoalRot = 0;
+                rightElbowGoalRot = -15;
+                leftElbowGoalRot = 10;
+            }
+
+            rightShoulder.EaseToNewRotation(rightShoulderGoalRot, .001f);
+            rightElbow.EaseToNewRotation(rightElbowGoalRot, .001f);
+            leftElbow.EaseToNewRotation(leftElbowGoalRot, .001f);
         }
     }
     private void AnimIdle()

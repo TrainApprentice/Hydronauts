@@ -198,7 +198,7 @@ public class PlayerMain : MonoBehaviour
     {
         transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
       
-        if(!isInCutscene)
+        if(!isInCutscene && !(specialDuration > 0 && currSpecial == "blast"))
         {
             if (Input.GetAxisRaw("Horizontal") < 0) transform.localScale = new Vector3(-1f, 1f, 1);
             if (Input.GetAxisRaw("Horizontal") > 0) transform.localScale = new Vector3(1f, 1f, 1);
@@ -230,6 +230,11 @@ public class PlayerMain : MonoBehaviour
                 isInvincible = true;
                 iFrames = 2;
                 AnimUpdate("damaged");
+            }
+            else if(perfectBlockTimer > 0)
+            {
+                isInvincible = true;
+                iFrames = 1;
             }
         }
         else
@@ -322,6 +327,14 @@ public class PlayerMain : MonoBehaviour
             hasSpecial = true;
         }
 
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Fire"))
+        {
+            if (collision.GetComponent<FireObstacle>()) ApplyDamage(collision.GetComponent<FireObstacle>().damage);
+            if (collision.GetComponent<FireProjectile>()) ApplyDamage(collision.GetComponent<FireProjectile>().damage);
+        }
     }
 
     private void RunDousing()

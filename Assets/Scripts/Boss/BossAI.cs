@@ -23,6 +23,7 @@ public class BossAI : MonoBehaviour
 
     public float health = 200;
 
+    private float iFrames = 0;
     private BossMovement mover;
     private Transform shockwavePos;
     private float timeBetweenAttacks = 5f;
@@ -52,6 +53,8 @@ public class BossAI : MonoBehaviour
     {
         if(!isDead)
         {
+            if (iFrames > 0) iFrames -= Time.deltaTime;
+            else iFrames = 0;
             if (timeBetweenAttacks > 0) timeBetweenAttacks -= Time.deltaTime;
             else
             {
@@ -60,7 +63,7 @@ public class BossAI : MonoBehaviour
                 {
                     float randAttack = Random.Range(0f, 1f);
 
-                    if (randAttack < .4f)
+                    if (randAttack < 1f)
                     {
                         FlamethrowerAttack();
                         fireAttackTimer = 2f;
@@ -153,16 +156,22 @@ public class BossAI : MonoBehaviour
     }
     public void ApplyDamage(float damage)
     {
-        health -= damage;
-        healthController.SetCurrentHealth(health);
+        if(iFrames == 0)
+        {
+            health -= damage;
+            healthController.SetCurrentHealth(health);
 
-        if (health <= 100) currPhase = 2;
-        if (health <= 0) isDead = true; 
+            iFrames = .5f;
+
+            if (health <= 100) currPhase = 2;
+            if (health <= 0) isDead = true;
+        }
+        
     }
 
     public void FlamethrowerAttack()
     {
-        mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, false, flamePattern + 5);
+        mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, (currPhase < 2), flamePattern + 5);
     }
     public void SlamAttack()
     {
@@ -194,12 +203,5 @@ public class BossAI : MonoBehaviour
         slamHitbox.SetActive(turnOn);
     }
 
-    public void PhaseChange()
-    {
-
-    }
-    public void DeathScene()
-    {
-
-    }
+   
 }
