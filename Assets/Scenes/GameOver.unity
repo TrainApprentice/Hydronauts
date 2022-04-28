@@ -2740,6 +2740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   quitWarning: {fileID: 1128592142}
   levelSlots: {fileID: 1248504422}
+  mainText: {fileID: 979147954}
 --- !u!4 &1351652470
 Transform:
   m_ObjectHideFlags: 0

@@ -74,12 +74,10 @@ public class PauseMenu : MonoBehaviour
     public void ShowConfirmOverwrite()
     {
         confirmOverwrite.SetActive(true);
-        saveSlots.SetActive(false);
     }
     public void HideConfirmOverwrite()
     {
         confirmOverwrite.SetActive(false);
-        saveSlots.SetActive(true);
     }
 
     public void BackToMenu()

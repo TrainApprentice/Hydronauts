@@ -20,9 +20,18 @@ public class SaveSlotDisplay : MonoBehaviour
     public Sprite blastSprite, sprinklerSprite;
     public Sprite emptySave, filledSave;
     
-    public void UpdateVisuals()
+    public void UpdateVisuals(bool isCleared)
     {
-        if(enemiesKilled > 0 && currSpecial != "")
+        if (isCleared)
+        {
+            slotNumber.gameObject.SetActive(true);
+            killDisplay.text = "";
+            levelDisplay.text = "";
+            specialImageDisplay.gameObject.SetActive(false);
+            specialText.gameObject.SetActive(false);
+            GetComponent<Image>().sprite = emptySave;
+        }
+        else
         {
             slotNumber.gameObject.SetActive(false);
             specialImageDisplay.gameObject.SetActive(true);
@@ -45,14 +54,6 @@ public class SaveSlotDisplay : MonoBehaviour
                     break;
             }
         }
-        else
-        {
-            slotNumber.gameObject.SetActive(true);
-            killDisplay.text = "";
-            levelDisplay.text = "";
-            specialImageDisplay.gameObject.SetActive(false);
-            specialText.gameObject.SetActive(false);
-            GetComponent<Image>().sprite = emptySave;
-        }
+        
     }
 }

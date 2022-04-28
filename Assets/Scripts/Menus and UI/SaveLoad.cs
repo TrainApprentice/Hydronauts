@@ -41,11 +41,8 @@ public class SaveLoad : MonoBehaviour
 
     public void DeleteSave()
     {
-        // Pop up Are You Sure?
-
         SaveFiles.instance.DeleteData(currSlotSelection);
         HideDeleteWarning();
         HideLoadDelete();
-        SaveFiles.instance.UpdateAllSlots();
     }
 }

@@ -1,5 +1,5 @@
 //using System;
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
             if (enemySpawnCooldown > 0) enemySpawnCooldown -= Time.fixedDeltaTime;
             else
             {
-                var randSpawn = new Vector3(UnityEngine.Random.Range(lWall.transform.position.x + 1f, rWall.transform.position.x - 1f), UnityEngine.Random.Range(lWall.transform.position.y + 3f, lWall.transform.position.y - 2f), 0f);
+                var randSpawn = new Vector3(Random.Range(lWall.transform.position.x + 1f, rWall.transform.position.x - 1f), Random.Range(lWall.transform.position.y + 3f, lWall.transform.position.y - 2f), 0f);
                 GameObject newEnemy;
 
                 switch(currEncounter)
@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
         switch(num)
         {
             case 1:
-                killGoal = 5;
+                killGoal = 3;
                 movementTut.SwitchOnOff(false);
                 if (!seenCombatTut)
                 {
@@ -182,10 +182,10 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case 2:
-                killGoal = 10;
+                killGoal = 8;
                 break;
             case 3:
-                killGoal = 8;
+                killGoal = 6;
                 break;
             case 4:
                 killGoal = 1;
@@ -250,6 +250,8 @@ public class GameManager : MonoBehaviour
         player = FindObjectOfType<PlayerMain>();
         encounterPos = FindObjectsOfType<EncounterMarker>();
         powerSpawn = FindObjectsOfType<PowerPos>();
+        bossSpawn = FindObjectOfType<BossSpawnMarker>().transform;
+        EndEncounter();
         SetupEncounters();
         FindTutorials();
         bossHealthBar = FindObjectOfType<BossUI>();
@@ -280,6 +282,7 @@ public class GameManager : MonoBehaviour
                 }
                 SpawnPowerups();
                 player.Reset(false);
+                totalKills = 0;
             }
             
         }

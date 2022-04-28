@@ -7,6 +7,7 @@ public class GameOver : MonoBehaviour
 {
     public GameObject quitWarning;
     public GameObject levelSlots;
+    public GameObject mainText;
     public void RestartLevel()
     {
         
@@ -16,12 +17,14 @@ public class GameOver : MonoBehaviour
 
     public void ShowLevelSlots()
     {
+        mainText.SetActive(false);
         levelSlots.SetActive(true);
         SaveFiles.instance.UpdateAllSlots();
     }
     public void HideLevelSlots()
     {
         levelSlots.SetActive(false);
+        mainText.SetActive(true);
     }
     public void BackToMenu()
     {
@@ -39,11 +42,13 @@ public class GameOver : MonoBehaviour
         // Pop up Are You Sure?
         // Unsaved progress will be lost
         quitWarning.SetActive(true);
+        mainText.SetActive(false);
     }
 
     public void HideQuitWarning()
     {
         quitWarning.SetActive(false);
+        mainText.SetActive(true);
     }
 
     

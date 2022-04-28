@@ -15,7 +15,7 @@ public class SaveFiles : MonoBehaviour
     public Vector3 playerPos;
     public int playerHealth;
     public bool playerHasSpecial;
-    public string currentSpecial;
+    public string currentSpecial = "";
     public float specialMeter;
  
     public int enemiesKilled;
@@ -63,6 +63,7 @@ public class SaveFiles : MonoBehaviour
         data.currentLevel = levelNum;
         data.slotNumber = slotNum;
         data.prevEncounter = lastEncounter;
+        print(p.currSpecial);
         bf.Serialize(file, data);
         file.Close();
 
@@ -81,8 +82,15 @@ public class SaveFiles : MonoBehaviour
             currentLevel = data.currentLevel;
             currentSpecial = data.currPlayerSpecial;
             enemiesKilled = data.killCountEnemies;
+            playerHasSpecial = data.playerHasSpecial;
             file.Close();
-            UpdateSlotData(slotNum);
+            UpdateSlotData(slotNum, true);
+        }
+        else
+        {
+            currentLevel = 0;
+            enemiesKilled = 0;
+            UpdateSlotData(slotNum, false);
         }
         
     }
@@ -114,7 +122,7 @@ public class SaveFiles : MonoBehaviour
         {
             File.Delete(Application.persistentDataPath + "SaveData" + slotNum + ".dat");
         }
-        UpdateSlotData(slotNum);
+        UpdateAllSlots();
     }
 
     public bool CheckDataInSlot(int slotNum)
@@ -128,17 +136,19 @@ public class SaveFiles : MonoBehaviour
         foreach (SaveSlotDisplay s in temp)
         {
             LoadSlotDisplay(s.slot);
-            s.UpdateVisuals();
+            //print(CheckDataInSlot(s.slot));
+            s.UpdateVisuals(!CheckDataInSlot(s.slot));
         }
     }
 
-    private void UpdateSlotData(int slotNum)
+    private void UpdateSlotData(int slotNum, bool isCleared)
     {
         FindSlot(slotNum);
+        
         currDisplay.currSpecial = currentSpecial;
         currDisplay.enemiesKilled = enemiesKilled;
         currDisplay.currLevel = currentLevel;
-        currDisplay.UpdateVisuals();
+        currDisplay.UpdateVisuals(isCleared);
     }
     private void FindSlot(int slotNum)
     {

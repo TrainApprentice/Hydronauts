@@ -25,7 +25,7 @@ public class PlayerMain : MonoBehaviour
     [HideInInspector]
     public bool isDead = false;
     [HideInInspector]
-    public string currSpecial = "sprinkler";
+    public string currSpecial = "";
     [HideInInspector]
     public bool hasSpecial = true;
     [HideInInspector]
@@ -155,9 +155,13 @@ public class PlayerMain : MonoBehaviour
             canMove = false;
             canAttack = false;
         }
-        else
+        else if(specialDuration == 0)
         {
             canAttack = true;
+            canMove = true;
+        }
+        else
+        {
             canMove = true;
         }
         if (Input.GetKeyDown("left ctrl"))
@@ -213,6 +217,7 @@ public class PlayerMain : MonoBehaviour
         isDead = false;
         if (!hasData)
         {
+            currSpecial = "";
             health = maxHealth;
             hasSpecial = false;
             specialDuration = 0;
