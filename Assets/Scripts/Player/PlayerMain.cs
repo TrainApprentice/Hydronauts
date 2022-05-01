@@ -174,6 +174,8 @@ public class PlayerMain : MonoBehaviour
         }
         else perfectBlockTimer = 0;
 
+        if (Time.timeScale == 0) canAttack = false;
+
         AttackInputs();
         //StateMachine();
         
@@ -330,6 +332,7 @@ public class PlayerMain : MonoBehaviour
             }
             specialMeter = maxSpecialMeter;
             hasSpecial = true;
+            GameManager.instance.ShowSpecialTutorial();
         }
 
     }
@@ -370,13 +373,11 @@ public class PlayerMain : MonoBehaviour
         if (comboTimer > 0) comboTimer -= Time.deltaTime;
         if(comboTimer < 0 || comboSequence.Count > 6)
         {
-            comboTimer = 0;
             comboSequence.Clear();
-            //rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
         if(!canAttack)
         {
-            attackCooldown -= Time.deltaTime;
+            if(attackCooldown > 0) attackCooldown -= Time.deltaTime;
             if(attackCooldown <= 0) canAttack = !isBlocking;
         }
         if(Input.GetButtonDown("Fire1") && canAttack)
@@ -386,19 +387,16 @@ public class PlayerMain : MonoBehaviour
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("light");
-            //rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
         }
 
         if(Input.GetButtonDown("Fire2") && canAttack)
         {
             comboTimer = .5f;
-            //Right Punch (Heavy Attack)
             comboSequence.Add(2);
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("heavy");
-            //rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
 

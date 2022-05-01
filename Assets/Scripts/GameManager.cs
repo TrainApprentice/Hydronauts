@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1") && !player) ResetGameStats();
-        if (Input.GetKeyDown("p"))
+        if (Input.GetKeyDown("p") || Input.GetKeyDown("escape"))
         {
             if (Time.timeScale == 0) ResumeGame();
             else PauseGame();
@@ -271,15 +271,11 @@ public class GameManager : MonoBehaviour
             {
                 LoadInSaveData();
                 player.Reset();
-
             }
             else
             {
-                if (!seenMoveTut)
-                {
-                    movementTut.SwitchOnOff(true);
-                    seenMoveTut = true;
-                }
+                movementTut.SwitchOnOff(true);
+                LoadInSaveData();
                 SpawnPowerups();
                 player.Reset(false);
                 totalKills = 0;
@@ -288,11 +284,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if (!seenMoveTut)
-            {
-                movementTut.SwitchOnOff(true);
-                seenMoveTut = true;
-            }
+            movementTut.SwitchOnOff(true);
             SpawnPowerups();
             player.Reset(false);
         }

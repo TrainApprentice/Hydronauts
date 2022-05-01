@@ -35,6 +35,8 @@ public class SaveFiles : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += RunOnSceneChange;
+
+            if (CheckDataInSlot(0)) DeleteData(0);
         }
     }
     private void Start()
@@ -96,7 +98,7 @@ public class SaveFiles : MonoBehaviour
     }
     public void LoadGame(int slotNum)
     {
-        if (CheckDataInSlot(slotNum))
+        if (CheckDataInSlot(slotNum) && slotNum != 0)
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "SaveData" + slotNum + ".dat", FileMode.Open);
@@ -112,6 +114,20 @@ public class SaveFiles : MonoBehaviour
             enemiesKilled = data.killCountEnemies;
             currentLevel = data.currentLevel;
             lastEncounter = data.prevEncounter;
+        }
+        else
+        {
+            playerPos = new Vector3(-4.9f, -.3f);
+            playerHealth = 15;
+            playerHasSpecial = false;
+            currentSpecial = "";
+            specialMeter = 0;
+
+            chosenSlot = slotNum;
+            enemiesKilled = 0;
+            currentLevel = 0;
+            lastEncounter = 0;
+            //if (GameManager.instance) GameManager.instance.ResetGameStats();
         }
         
     }

@@ -12,6 +12,7 @@ public class GameOver : MonoBehaviour
     {
         
         SceneManager.LoadScene("Level1");
+        SaveFiles.instance.LoadGame(0);
         GameManager.instance.ResetGameStats();
     }
 

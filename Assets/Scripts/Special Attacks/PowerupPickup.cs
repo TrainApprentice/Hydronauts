@@ -21,9 +21,5 @@ public class PowerupPickup : MonoBehaviour
         }
         
     }
-
-    private void OnDestroy()
-    {
-        GameManager.instance.ShowSpecialTutorial();
-    }
+    
 }
