@@ -288,7 +288,7 @@ public class GameManager : MonoBehaviour
                 player.Reset(false);
                 totalKills = 0;
             }
-            
+
         }
         else
         {

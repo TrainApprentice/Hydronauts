@@ -18,6 +18,9 @@ public class EnemyMain : MonoBehaviour
     public bool isDead = false;
     public bool isStunned = false;
 
+    public AudioClip gotHit;
+    private AudioSource sound;
+
     private float iFrames = 0;
     // Start is called before the first frame update
     void Start()
@@ -29,22 +32,14 @@ public class EnemyMain : MonoBehaviour
         if (GetComponent<MeleeEnemyAI>()) enemyType = 1;
         else if (GetComponent<RangedEnemyAI>()) enemyType = 2;
 
+        sound = GetComponent<AudioSource>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (AIController.isAttacking)
-        {
-            //GetComponent<SpriteRenderer>().color = new Color(1, .5f, .5f);
-            //AnimUpdate("doAttack");
-        }
-        else
-        {
-            //GetComponent<SpriteRenderer>().color = new Color(1, 1, 1);
-        }
-        */
+       
         if (iFrames > 0)
         {
             iFrames -= Time.deltaTime;
@@ -57,7 +52,7 @@ public class EnemyMain : MonoBehaviour
             isStunned = false;
             healthBar.SetActive(false);
             barBack.SetActive(false);
-            //GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1f);
+            
         }
 
         if (animResetTimer > 0) animResetTimer -= Time.deltaTime;
@@ -65,7 +60,6 @@ public class EnemyMain : MonoBehaviour
         {
             animResetTimer = 0;
             masterAnim.SetBool("onHit", false);
-            //masterAnim.SetBool("doAttack", false);
 
         }
 
@@ -83,6 +77,9 @@ public class EnemyMain : MonoBehaviour
             AnimUpdate("onHit");
             masterAnim.SetBool("doAttack", false);
             masterAnim.SetBool("isWalking", false);
+
+            sound.clip = gotHit;
+            sound.Play();
         }
         
         if (health <= 0) isDead = true;

@@ -9,11 +9,13 @@ public class BossAI : MonoBehaviour
     public Transform fireSpawnLeft, fireSpawnRight;
     public Transform playerRef;
     public GameObject slamHitbox;
-    
+    public AudioClip gotHit;
+
     [HideInInspector]
     public Transform[] fireAttackPositions = new Transform[3];
 
     private BossUI healthController;
+    private AudioSource sound;
 
     public bool isAttackingFire = false;
     public bool isAttackingSlam = false;
@@ -43,7 +45,7 @@ public class BossAI : MonoBehaviour
 
         healthController = FindObjectOfType<BossUI>();
         //healthController.gameObject.SetActive(true);
-
+        sound = GetComponent<AudioSource>();
         
         
     }
@@ -162,6 +164,9 @@ public class BossAI : MonoBehaviour
             healthController.SetCurrentHealth(health);
 
             iFrames = .5f;
+
+            sound.clip = gotHit;
+            sound.Play();
 
             if (health <= 100) currPhase = 2;
             if (health <= 0) isDead = true;

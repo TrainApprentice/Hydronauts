@@ -13,6 +13,7 @@ public class PlayerMain : MonoBehaviour
     public Rigidbody2D rb;
     public SpriteRenderer sprite;
     public GameObject sprinklerAttack, blastAttack, dousingBox;
+    public AudioClip gotHit, lightPunch, heavyPunch, sprinkler, hose, dousing;
 
     [HideInInspector]
     public int health = 15;
@@ -65,6 +66,7 @@ public class PlayerMain : MonoBehaviour
 
     private GameObject shadow;
     private GameObject currDouse;
+    private AudioSource sfx;
 
     // Start is called before the first frame update
     void Start()
@@ -72,7 +74,7 @@ public class PlayerMain : MonoBehaviour
         shadow = transform.Find("Shadow").gameObject;
 
         cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();
-        
+        sfx = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -96,6 +98,8 @@ public class PlayerMain : MonoBehaviour
             canAttack = true;
             canBlock = true;
             moveSpeed = 5f;
+            sfx.Stop();
+            sfx.loop = false;
         }
         
 
@@ -237,11 +241,23 @@ public class PlayerMain : MonoBehaviour
                 isInvincible = true;
                 iFrames = 2;
                 AnimUpdate("damaged");
+
+                sfx.clip = gotHit;
+                sfx.volume = 1f;
+                sfx.loop = false;
+                sfx.Play();
+                
             }
             else if(perfectBlockTimer > 0)
             {
                 isInvincible = true;
                 iFrames = 1;
+
+                sfx.clip = gotHit;
+                sfx.volume = .6f;
+                sfx.loop = false;
+                sfx.Play();
+                
             }
         }
         else
@@ -347,24 +363,39 @@ public class PlayerMain : MonoBehaviour
 
     private void RunDousing()
     {
-        if (isDousing)
+        if(specialDuration == 0)
         {
-            if (!currDouse)
+            if (isDousing)
             {
-                float offset = transform.localScale.x;
-                currDouse = Instantiate(dousingBox, new Vector3(transform.position.x + offset, transform.position.y - .5f), Quaternion.identity);
-                currDouse.transform.localScale = transform.localScale;
+                if (!currDouse)
+                {
+                    float offset = transform.localScale.x;
+                    currDouse = Instantiate(dousingBox, new Vector3(transform.position.x + offset, transform.position.y - .5f), Quaternion.identity);
+                    currDouse.transform.localScale = transform.localScale;
+
+                    sfx.clip = dousing;
+                    sfx.volume = .6f;
+                    sfx.loop = true;
+                    sfx.Play();
+
+                }
+                canMove = false;
+                canAttack = false;
             }
-            canMove = false;
-            canAttack = false;
+            else
+            {
+                canMove = !isBlocking;
+                canAttack = !isBlocking;
+                if (currDouse)
+                {
+                    sfx.Stop();
+                    sfx.loop = false;
+                    Destroy(currDouse);
+                }
+            }
+
         }
-        else
-        {
-            canMove = !isBlocking;
-            canAttack = !isBlocking;
-            Destroy(currDouse);
-        }
-        
+
     }
 
 
@@ -387,7 +418,10 @@ public class PlayerMain : MonoBehaviour
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("light");
-
+            sfx.clip = lightPunch;
+            sfx.volume = .6f;
+            sfx.loop = false;
+            sfx.Play();
         }
 
         if(Input.GetButtonDown("Fire2") && canAttack)
@@ -397,6 +431,11 @@ public class PlayerMain : MonoBehaviour
             canAttack = false;
             attackCooldown = .2f;
             CheckCombos("heavy");
+
+            sfx.clip = heavyPunch;
+            sfx.volume = .6f;
+            sfx.loop = false;
+            sfx.Play();
         }
     }
 
@@ -447,12 +486,22 @@ public class PlayerMain : MonoBehaviour
                     GameObject newBlast = Instantiate(blastAttack, transform.position, Quaternion.identity);
                     if (transform.localScale.x < 0) newBlast.GetComponent<Blast>().flipDirection = true;
                     moveSpeed = 2f;
+
+                    sfx.clip = hose;
+                    sfx.volume = .6f;
+                    sfx.loop = true;
+                    sfx.Play();
                     break;
                 case "sprinkler":
                     specialMeter -= 6f;
                     specialDuration = 2f;
                     Instantiate(sprinklerAttack, transform.position, Quaternion.identity);
                     moveSpeed = 2f;
+
+                    sfx.clip = sprinkler;
+                    sfx.volume = .6f;
+                    sfx.loop = true;
+                    sfx.Play();
                     break;
                 default:
                     print("Can't use that!");

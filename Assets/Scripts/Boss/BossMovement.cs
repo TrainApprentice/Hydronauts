@@ -6,6 +6,10 @@ public class BossMovement : MonoBehaviour
 {
     public JointStorage leftShoulder, rightShoulder, leftHip, rightHip, leftElbow, rightElbow, leftKnee, rightKnee, baseSkeleton, baseBody;
 
+    public AudioClip flames, groundPunch, slam;
+    private AudioSource sound;
+    private bool doSoundOnce = true;
+
     private float animIdleTimer = 0;
     private float animWalkTimer = 0;
     private float animRushTimer = 0;
@@ -16,7 +20,6 @@ public class BossMovement : MonoBehaviour
     private bool doShake = true;
 
     private float walkTimer = 0f;
-    private float timeBetweenMovements = 2f;
     private bool slowMovement = false;
     private Transform playerRef;
     private BossAI controller;
@@ -46,6 +49,8 @@ public class BossMovement : MonoBehaviour
         playerRef = FindObjectOfType<PlayerMain>().transform;
         controller = GetComponent<BossAI>();
         cam = FindObjectOfType<CameraFollow>();
+
+        sound = GetComponent<AudioSource>();
 
         SetNewLocation(controller.fireAttackPositions[2].position + new Vector3(2, 0), true, 0, true);
     }
@@ -141,6 +146,12 @@ public class BossMovement : MonoBehaviour
 
             if (slamAttackDuration < .7f)
             {
+                if(doSoundOnce)
+                {
+                    sound.clip = slam;
+                    sound.Play();
+                    doSoundOnce = false;
+                }
                 baseBodyGoalRot = 10;
                 baseBodyGoalPos = new Vector3(-.57f, .14f);
 
@@ -185,6 +196,9 @@ public class BossMovement : MonoBehaviour
                 {
                     cam.Shake(.2f, 2);
                     doShake = false;
+                    sound.clip = groundPunch;
+                    sound.Play();
+                    doSoundOnce = false;
                 }
             }
             else if(slamAttackDuration > 2.5f)
@@ -313,6 +327,9 @@ public class BossMovement : MonoBehaviour
                     addPunch = false;
                     cam.Shake(.1f, 1);
                     controller.SummonDebris();
+                    sound.clip = groundPunch;
+                    sound.volume = .4f;
+                    sound.Play();
                 }
                 if (checkTime % 5 != 0) addPunch = true;
                 if (punchCounter % 2 == 0)
@@ -542,6 +559,13 @@ public class BossMovement : MonoBehaviour
             float rightElbowGoalRot = rightElbow.startRot.eulerAngles.z;
             float leftElbowGoalRot = leftElbow.startRot.eulerAngles.z;
             float rightShoulderGoalRot = rightShoulder.startRot.eulerAngles.z;
+            if(doSoundOnce)
+            {
+                sound.clip = flames;
+                sound.volume = .6f;
+                sound.Play();
+                doSoundOnce = false;
+            }
             if (currFlamePattern == 1)
             {
                 leftElbowGoalRot = 10;
@@ -565,6 +589,7 @@ public class BossMovement : MonoBehaviour
     }
     private void AnimIdle()
     {
+        doSoundOnce = true;
         ResetTimers("IDLE");
         animIdleTimer += Time.deltaTime;
         

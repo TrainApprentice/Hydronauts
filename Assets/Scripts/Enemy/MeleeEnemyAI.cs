@@ -9,6 +9,9 @@ public class MeleeEnemyAI : MonoBehaviour
     public Animator AnimController;
     public EnemyMain master;
 
+    public AudioClip punch;
+    private AudioSource sound;
+
     public Transform target;
     private Vector3 punchTarget;
 
@@ -31,7 +34,7 @@ public class MeleeEnemyAI : MonoBehaviour
     {
         target = GameObject.Find("Player").GetComponent<Transform>();
         seeker = GetComponent<Seeker>();
-
+        sound = GetComponent<AudioSource>();
 
         if (transform.position.x > target.position.x)
         {
@@ -106,7 +109,12 @@ public class MeleeEnemyAI : MonoBehaviour
     private IEnumerator MeleeAttack()
     {
         AnimController.SetBool("isWalking", false);
-        if(!AnimController.GetBool("doAttack")) AnimController.SetBool("doAttack", true);
+        if (!AnimController.GetBool("doAttack"))
+        {
+            sound.clip = punch;
+            sound.Play();
+            AnimController.SetBool("doAttack", true);
+        }
         isAttacking = true;
         attackTimer -= Time.deltaTime;
         if(attackTimer <= 0)

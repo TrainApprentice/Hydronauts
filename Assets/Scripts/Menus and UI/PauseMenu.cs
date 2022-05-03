@@ -12,6 +12,8 @@ public class PauseMenu : MonoBehaviour
     public GameObject saveSlots;
     public GameObject menuWarning, quitWarning, confirmOverwrite;
 
+    public ButtonSounds sound;
+
     private int currSaveSlot = 0;
 
     public void CheckSlot(int slotNum)
@@ -113,7 +115,7 @@ public class PauseMenu : MonoBehaviour
         quitWarning = GameObject.FindGameObjectWithTag("QuitWarning");
         confirmOverwrite = GameObject.FindGameObjectWithTag("ConfirmOverwrite");
         menuWarning = GameObject.FindGameObjectWithTag("MenuWarning");
-
+        sound = FindObjectOfType<ButtonSounds>();
         
 
         SetButtonFunctions();
@@ -130,6 +132,7 @@ public class PauseMenu : MonoBehaviour
         foreach(Button b in allButtons)
         {
             b.onClick.RemoveAllListeners();
+            b.onClick.AddListener(sound.PlayClick);
             switch(b.gameObject.name)
             {
                 case "Resume":

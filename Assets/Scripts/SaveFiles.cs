@@ -23,6 +23,7 @@ public class SaveFiles : MonoBehaviour
     public int lastEncounter;
 
     private SaveSlotDisplay currDisplay;
+    private ButtonSounds sound;
     void Awake()
     {
         if (instance)
@@ -34,6 +35,7 @@ public class SaveFiles : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            sound = GetComponent<ButtonSounds>();
             SceneManager.sceneLoaded += RunOnSceneChange;
 
             if (CheckDataInSlot(0)) DeleteData(0);

@@ -10,6 +10,9 @@ public class RangedEnemyAI : MonoBehaviour
     public EnemyMain master;
 
     public GameObject projectile;
+    public AudioClip throwing;
+    private AudioSource sound;
+
     private int projectileType;
     public Transform target;
     private float walkDistance = 10f;
@@ -27,6 +30,7 @@ public class RangedEnemyAI : MonoBehaviour
     float attackCooldown = 1f;
     public bool isAttacking = false;
     private bool hasThrown = false;
+    private bool doSoundOnce = true;
 
     Seeker seeker;
 
@@ -114,6 +118,12 @@ public class RangedEnemyAI : MonoBehaviour
 
     private IEnumerator RangedAttack()
     {
+        if(doSoundOnce)
+        {
+            sound.clip = throwing;
+            sound.Play();
+            doSoundOnce = false;
+        }
         AnimController.SetBool("isWalking", false);
         if(!AnimController.GetBool("doAttack")) AnimController.SetBool("doAttack", true);
         attackTimer -= Time.deltaTime;
@@ -133,6 +143,7 @@ public class RangedEnemyAI : MonoBehaviour
             hasThrown = false;
             AnimController.SetBool("doAttack", false);
             isAttacking = false;
+            doSoundOnce = true;
         }
         yield return new WaitForSeconds(Time.deltaTime);
     }
