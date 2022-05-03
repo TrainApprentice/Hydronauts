@@ -10,6 +10,8 @@ public class WinScreen : MonoBehaviour
         if (!SaveFiles.instance) return;
 
         SaveFiles.instance.SaveGame(GameManager.instance.player, new Vector3(30, -22), SaveFiles.instance.chosenSlot, GameManager.instance.totalKills + 1, 1, 4);
+
+        MusicManager.instance.SwitchTrack("Win");
     }
     public void BackToTitle()
     {

@@ -190,6 +190,7 @@ public class GameManager : MonoBehaviour
             case 4:
                 killGoal = 1;
                 bossHealthBar.gameObject.SetActive(true);
+                MusicManager.instance.SwitchTrack("Boss");
                 break;
         }
         SetWalls(num);
@@ -265,6 +266,7 @@ public class GameManager : MonoBehaviour
         GetComponent<PauseMenu>().FindMenuElements();
         ResumeGame();
 
+        MusicManager.instance.SwitchTrack("Gameplay");
         if (SaveFiles.instance)
         {
             if (SaveFiles.instance.CheckDataInSlot(SaveFiles.instance.chosenSlot))

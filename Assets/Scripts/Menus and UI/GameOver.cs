@@ -8,6 +8,11 @@ public class GameOver : MonoBehaviour
     public GameObject quitWarning;
     public GameObject levelSlots;
     public GameObject mainText;
+
+    private void Start()
+    {
+        MusicManager.instance.SwitchTrack("Lose");
+    }
     public void RestartLevel()
     {
         
