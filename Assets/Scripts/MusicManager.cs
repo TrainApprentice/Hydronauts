@@ -9,6 +9,7 @@ public class MusicManager : MonoBehaviour
 
     public AudioClip menuTrack, gameplayTrack, bossTrack, winTrack, loseTrack;
     public AudioSource main;
+    public string currTrack;
 
     private void Awake()
     {
@@ -52,6 +53,7 @@ public class MusicManager : MonoBehaviour
             default:
                 break;
         }
+        currTrack = newTrack;
         main.Play();
     }
 }

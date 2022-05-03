@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
         if (player.isInCutscene) cutsceneTimer += Time.deltaTime;
         if(cutsceneTimer > 4f && SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Level1"))
         {
-            SceneManager.LoadScene("EndScene");
+            GoToCredits();
             player.Reset();
         }
         
@@ -148,6 +148,12 @@ public class GameManager : MonoBehaviour
     private void GoToGameOver()
     {
         SceneManager.LoadScene("GameOver");
+    }
+    private void GoToCredits()
+    {
+        MusicManager.instance.SwitchTrack("Win");
+        SceneManager.LoadScene("EndScene");
+        
     }
     private void UpdateEnemies()
     {

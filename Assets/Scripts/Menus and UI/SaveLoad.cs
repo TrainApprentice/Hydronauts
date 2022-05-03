@@ -8,6 +8,7 @@ public class SaveLoad : MonoBehaviour
 {
     public GameObject fileChoice;
     public GameObject deleteWarning;
+    public GameObject quitWarning;
 
     private int currSlotSelection = 0;
 
@@ -44,5 +45,25 @@ public class SaveLoad : MonoBehaviour
         SaveFiles.instance.DeleteData(currSlotSelection);
         HideDeleteWarning();
         HideLoadDelete();
+    }
+
+    public void ShowQuitWarning()
+    {
+        quitWarning.SetActive(true);
+    }
+
+    public void HideQuitWarning()
+    {
+        quitWarning.SetActive(false);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void GoToCredits()
+    {
+        SceneManager.LoadScene("EndScene");
     }
 }
