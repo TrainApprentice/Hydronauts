@@ -23,6 +23,7 @@ public class DebrisObstacle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Update the opacity based on current health
         float alpha = currHealth / maxHealth;
         sprite.color = new Color(1, 1, 1, alpha);
 
@@ -34,6 +35,10 @@ public class DebrisObstacle : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Called outside the class to damage the obstacle
+    /// </summary>
+    /// <param name="damage"></param>
     public void ApplyDamage(float damage)
     {
         currHealth -= damage;

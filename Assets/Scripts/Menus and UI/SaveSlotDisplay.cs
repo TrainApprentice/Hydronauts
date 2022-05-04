@@ -20,8 +20,13 @@ public class SaveSlotDisplay : MonoBehaviour
     public Sprite blastSprite, sprinklerSprite;
     public Sprite emptySave, filledSave;
     
+    /// <summary>
+    /// Updates the visuals of the save slot with appropriate information if there's save data, or clearing it if there isn't
+    /// </summary>
+    /// <param name="isCleared"></param>
     public void UpdateVisuals(bool isCleared)
     {
+        // If there's no save data, clear the display
         if (isCleared)
         {
             slotNumber.gameObject.SetActive(true);
@@ -31,6 +36,7 @@ public class SaveSlotDisplay : MonoBehaviour
             specialText.gameObject.SetActive(false);
             GetComponent<Image>().sprite = emptySave;
         }
+        // Otherwise, show relevant information
         else
         {
             slotNumber.gameObject.SetActive(false);

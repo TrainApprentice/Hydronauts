@@ -51,7 +51,15 @@ public class SaveFiles : MonoBehaviour
         UpdateAllSlots();
     }
     
-
+    /// <summary>
+    /// Sets up the data to be stored and saves it to the computer
+    /// </summary>
+    /// <param name="p"></param>
+    /// <param name="pos"></param>
+    /// <param name="slotNum"></param>
+    /// <param name="killCount"></param>
+    /// <param name="levelNum"></param>
+    /// <param name="lastEncounter"></param>
     public void SaveGame(PlayerMain p, Vector3 pos, int slotNum, int killCount, int levelNum, int lastEncounter)
     {
         BinaryFormatter bf = new BinaryFormatter();
@@ -67,12 +75,14 @@ public class SaveFiles : MonoBehaviour
         data.currentLevel = levelNum;
         data.slotNumber = slotNum;
         data.prevEncounter = lastEncounter;
-        print(p.currSpecial);
         bf.Serialize(file, data);
         file.Close();
 
     }
-
+    /// <summary>
+    /// Load up the chosen save slot, and use its information to update the slot's display info
+    /// </summary>
+    /// <param name="slotNum"></param>
     public void LoadSlotDisplay(int slotNum)
     {
         if (CheckDataInSlot(slotNum))
@@ -98,6 +108,10 @@ public class SaveFiles : MonoBehaviour
         }
         
     }
+    /// <summary>
+    /// Loads the game from a certain slot, and stores all information for use by the GameManager
+    /// </summary>
+    /// <param name="slotNum"></param>
     public void LoadGame(int slotNum)
     {
         if (CheckDataInSlot(slotNum) && slotNum != 0)
@@ -134,6 +148,10 @@ public class SaveFiles : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Deletes the data in the given slot directly
+    /// </summary>
+    /// <param name="slotNum"></param>
     public void DeleteData(int slotNum)
     {
         if (CheckDataInSlot(slotNum))
@@ -143,10 +161,18 @@ public class SaveFiles : MonoBehaviour
         UpdateAllSlots();
     }
 
+    /// <summary>
+    /// A function to check if there is data at the given slot
+    /// </summary>
+    /// <param name="slotNum"></param>
+    /// <returns>Whether there is data in the slot</returns>
     public bool CheckDataInSlot(int slotNum)
     {
         return File.Exists(Application.persistentDataPath + "SaveData" + slotNum + ".dat");
     }
+    /// <summary>
+    /// Find all save slots in the level, and update them with all saved data
+    /// </summary>
     public void UpdateAllSlots()
     {
         SaveSlotDisplay[] temp = FindObjectsOfType<SaveSlotDisplay>();
@@ -154,11 +180,14 @@ public class SaveFiles : MonoBehaviour
         foreach (SaveSlotDisplay s in temp)
         {
             LoadSlotDisplay(s.slot);
-            //print(CheckDataInSlot(s.slot));
             s.UpdateVisuals(!CheckDataInSlot(s.slot));
         }
     }
-
+    /// <summary>
+    /// Updates the current SaveSlotDisplay's data
+    /// </summary>
+    /// <param name="slotNum"></param>
+    /// <param name="isCleared"></param>
     private void UpdateSlotData(int slotNum, bool isCleared)
     {
         FindSlot(slotNum);
@@ -168,6 +197,10 @@ public class SaveFiles : MonoBehaviour
         currDisplay.currLevel = currentLevel;
         currDisplay.UpdateVisuals(isCleared);
     }
+    /// <summary>
+    /// Finds the save slot at a given int and sets currDisplay to it
+    /// </summary>
+    /// <param name="slotNum"></param>
     private void FindSlot(int slotNum)
     {
         SaveSlotDisplay[] temp = FindObjectsOfType<SaveSlotDisplay>();

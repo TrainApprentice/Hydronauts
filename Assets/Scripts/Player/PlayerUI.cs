@@ -26,6 +26,9 @@ public class PlayerUI : MonoBehaviour
         CheckCurrentSpecial();
     }
 
+    /// <summary>
+    /// Update the player's health bar, easing toward their current health from their previous health
+    /// </summary>
     public void UpdateHealth()
     {
         float p = (float)playerRef.health / playerRef.maxHealth;
@@ -37,6 +40,9 @@ public class PlayerUI : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Update the player's special meter, easing the needle towards the player's specialMeter value
+    /// </summary>
     void UpdateSpecialMeter()
     {
         float p = playerRef.specialMeter / playerRef.maxSpecialMeter;
@@ -48,6 +54,9 @@ public class PlayerUI : MonoBehaviour
         specialMeterNeedle.transform.localRotation = (p!= 0) ? AnimMath.Ease(specialMeterNeedle.transform.localRotation, goalRot, .001f, false) : goalRot;
     }
 
+    /// <summary>
+    /// Display the player's current special next to the health bar
+    /// </summary>
     void CheckCurrentSpecial()
     {
         currSpecial.gameObject.SetActive(true);

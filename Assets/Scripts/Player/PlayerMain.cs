@@ -50,12 +50,8 @@ public class PlayerMain : MonoBehaviour
 
     Vector2 movement;
 
-    private int playerState, animState;
     private bool canAttack = true;
     private bool isWalking = false;
-
-    private float landingY;
-    private bool setLanding = false;
 
     private float comboTimer = .3f;
     private List<int> comboSequence = new List<int>();
@@ -82,16 +78,18 @@ public class PlayerMain : MonoBehaviour
     {
         RunDousing();
         
-
+        // If the player is using a special attack, count down the duration and limit the player abilities
         if (specialDuration > 0)
         {
             canAttack = false;
             canBlock = false;
-            //if (currSpecial == "blast") canMove = false;
+            
+            // This makes sure that the specialDuration is never directly equal to 0
             if (specialDuration - Time.deltaTime == 0) specialDuration -= Time.deltaTime * 1.1f;
             else specialDuration -= Time.deltaTime;
 
         }
+        // Resets values to normal
         else if(specialDuration < 0)
         { 
             specialDuration = 0;
@@ -102,11 +100,12 @@ public class PlayerMain : MonoBehaviour
             sfx.loop = false;
         }
         
-
-        isRunning = Input.GetKey("left shift");
+        // Check if the player is running and update speed accordingly
+        isRunning = Input.GetKey("left shift") && canAttack;
         if (isRunning) moveSpeed = 10f;
         else if (specialDuration == 0) moveSpeed = 5f;
 
+        // If the player has a special attack, slowly increase the special meter
         if (hasSpecial)
         {
             if (specialMeter < maxSpecialMeter) specialMeter += Time.deltaTime * specialRechargeRate;
@@ -114,6 +113,7 @@ public class PlayerMain : MonoBehaviour
         }
         else specialMeter = 0;
 
+        // If the player isn't in a cutscene, run the player movement
         if (!isInCutscene)
         {
             if (canMove)
@@ -125,6 +125,7 @@ public class PlayerMain : MonoBehaviour
         }
         else rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
+        // Update the animator based on whether the player is moving
         if (movement != Vector2.zero && !isWalking && specialDuration <= 0)
         {
             AnimUpdate("walking");
@@ -136,6 +137,7 @@ public class PlayerMain : MonoBehaviour
             AnimUpdate("walking", false);
         }
 
+        // Reset all animator values to false to prepare for other inputs
         if (animResetTimer > 0) animResetTimer -= Time.deltaTime;
         else
         {
@@ -147,12 +149,18 @@ public class PlayerMain : MonoBehaviour
             AnimUpdate("longHit", false);
 
         }
+
+        // If the player presses Q, activate their special
         if(Input.GetKeyDown("q"))
         {
             ActivateSpecial();
             GameManager.instance.HideSpecialTutorial();
         }
+
+        // Check for dousing input
         isDousing = Input.GetKey("r");
+
+        // Run blocking ability
         isBlocking = Input.GetKey("left ctrl") && canBlock;
         if (isBlocking)
         {
@@ -168,6 +176,7 @@ public class PlayerMain : MonoBehaviour
         {
             canMove = true;
         }
+        // Run perfect block timer
         if (Input.GetKeyDown("left ctrl"))
         {
             perfectBlockTimer = .2f;
@@ -178,12 +187,13 @@ public class PlayerMain : MonoBehaviour
         }
         else perfectBlockTimer = 0;
 
+        // If the game is paused, the player can't attack
         if (Time.timeScale == 0) canAttack = false;
 
+        // Check for attack inputs from the mouse
         AttackInputs();
-        //StateMachine();
-        
 
+        // If the player is invincible, fade them a little and update the animator
         if (iFrames > 0)
         {
             sprite.color = new Color(1, 1, 1, .6f);
@@ -198,6 +208,7 @@ public class PlayerMain : MonoBehaviour
         }
         AnimUpdate("blocking", isBlocking);
         
+        
         if (health <= 0) isDead = true;
 
     }
@@ -206,6 +217,7 @@ public class PlayerMain : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // This is what actually moves the player
         transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
       
         if(!isInCutscene && !(specialDuration > 0 && currSpecial == "blast"))
@@ -217,6 +229,10 @@ public class PlayerMain : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Resets the player information after loading into the game scene
+    /// </summary>
+    /// <param name="hasData"></param>
     public void Reset(bool hasData = true)
     {
 
@@ -231,6 +247,10 @@ public class PlayerMain : MonoBehaviour
         }
 
     }
+    /// <summary>
+    /// Deals damage to the player 
+    /// </summary>
+    /// <param name="damage"></param>
     public void ApplyDamage(int damage)
     {
         if (damage > 0)
@@ -268,6 +288,10 @@ public class PlayerMain : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Dictates the player's movement in cutscenes
+    /// </summary>
+    /// <param name="direction"></param>
     public void SetMovementInCutscene(string direction)
     {
         if (!isInCutscene) return;
@@ -302,6 +326,7 @@ public class PlayerMain : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // If the player runs into an encounter hitbox, begin that encounter
         if (collision.CompareTag("Encounter"))
         {
             switch (collision.gameObject.name)
@@ -322,6 +347,7 @@ public class PlayerMain : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
 
+        // If the player collides with damaging objects, deal damage
         if(collision.CompareTag("Fire"))
         {
             if(collision.GetComponent<FireObstacle>()) ApplyDamage(collision.GetComponent<FireObstacle>().damage);
@@ -333,11 +359,12 @@ public class PlayerMain : MonoBehaviour
             ApplyDamage(collision.GetComponent<DebrisCollision>().damage);
             collision.GetComponent<DebrisCollision>().DestroyMe();
         }
-
         if(collision.CompareTag("Slam"))
         {
             ApplyDamage(4);
         }
+
+        // If the player collides with a powerup, grant them the correct powerup
         if(collision.CompareTag("Powerup"))
         {
             currSpecial = (collision.GetComponent<PowerupPickup>().powerupType == 1) ? "blast" : "sprinkler";
@@ -361,6 +388,9 @@ public class PlayerMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Run the dousing function to make sure the player can't douse in multiple places at once, or while moving
+    /// </summary>
     private void RunDousing()
     {
         if(specialDuration == 0)
@@ -398,7 +428,9 @@ public class PlayerMain : MonoBehaviour
 
     }
 
-
+    /// <summary>
+    /// Takes in all inputs and keeps track of the current combos
+    /// </summary>
     private void AttackInputs()
     {
         if (comboTimer > 0) comboTimer -= Time.deltaTime;
@@ -438,7 +470,10 @@ public class PlayerMain : MonoBehaviour
             sfx.Play();
         }
     }
-
+    /// <summary>
+    /// Checks the current combo array against the set combos stored in the class, and updates the animator accordingly
+    /// </summary>
+    /// <param name="type"></param>
     private void CheckCombos(string type)
     {
         var tempArray = comboSequence.ToArray();
@@ -473,7 +508,9 @@ public class PlayerMain : MonoBehaviour
         
         
     }
-
+    /// <summary>
+    /// Activates the special attack based on the player's current special
+    /// </summary>
     private void ActivateSpecial()
     {
         if(hasSpecial && specialMeter == maxSpecialMeter)
@@ -510,15 +547,23 @@ public class PlayerMain : MonoBehaviour
             }
         }
     }
-
+    /// <summary>
+    /// Updates the animator's value with the given string
+    /// </summary>
+    /// <param name="varUpdate"></param>
+    /// <param name="setVal"></param>
     private void AnimUpdate(string varUpdate, bool setVal = true)
     {
         masterAnim.SetBool(varUpdate, setVal);
-        //if(varUpdate != "walking") animResetTimer = .1f;
 
         
     }
-
+    /// <summary>
+    /// Compares two int arrays to see if they're equal
+    /// </summary>
+    /// <param name="arr1"></param>
+    /// <param name="arr2"></param>
+    /// <returns>Whether the two int arrays are equal</returns>
     private bool CompareIntArrays(int[] arr1, int[] arr2)
     {
         if (arr1.Length != arr2.Length) return false;

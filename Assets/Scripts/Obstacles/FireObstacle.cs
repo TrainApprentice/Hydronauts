@@ -17,6 +17,7 @@ public class FireObstacle : MonoBehaviour
     private PlayerMain player;
     void Start()
     {
+        // Randomize the size of the flame
         size = Random.Range(2, 4);
         damage = Mathf.FloorToInt(size);
 
@@ -25,6 +26,7 @@ public class FireObstacle : MonoBehaviour
         player = FindObjectOfType<PlayerMain>();
         sfx = GetComponent<AudioSource>();
 
+        // Start the ambient sound loop
         sfx.loop = true;
         sfx.clip = ambient;
         sfx.Play();
@@ -33,6 +35,7 @@ public class FireObstacle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // If health is below zero, switch the sound playing, hide the dousing tutorial, and heal the player
         if (currHealth < 0)
         {
             GameManager.instance.HideDousingTutorial();
@@ -44,13 +47,16 @@ public class FireObstacle : MonoBehaviour
             soundTimer = .8f;
             currHealth = 0;
         }
+        // Once the flame is dead, let the doused sound play out before destroying the obstacle
         if (currHealth == 0)
         {
             soundTimer -= Time.deltaTime;
             if (soundTimer <= 0) Destroy(gameObject);
         }
+        
         CheckPlayerDistance();
 
+        // Update the flame's size based on its current health
         float p = currHealth / maxHealth;
 
         Vector3 smallestSize = (currHealth == 0) ? Vector3.zero : new Vector3(size / 8, size / 8, 1);
@@ -59,11 +65,18 @@ public class FireObstacle : MonoBehaviour
         transform.localScale = AnimMath.Lerp(smallestSize, largestSize, p);
     }
 
+    /// <summary>
+    /// Called outside the class to deal damage to the fire obstacle
+    /// </summary>
+    /// <param name="damage"></param>
     public void ApplyDamage(float damage = .05f)
     {
         if(currHealth > 0) currHealth -= damage;
     }
 
+    /// <summary>
+    /// Check the distance between this obstacle and the player, and change the volume of the ambient fire accordingly
+    /// </summary>
     private void CheckPlayerDistance()
     {
         float dist = Vector3.Distance(transform.position, player.transform.position);

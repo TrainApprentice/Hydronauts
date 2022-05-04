@@ -23,6 +23,7 @@ public class WinScreen : MonoBehaviour
 
     private void Update()
     {
+        // Countdown the swap timer
         if (swapTimer > 0) swapTimer -= Time.deltaTime;
         else
         {
@@ -32,11 +33,17 @@ public class WinScreen : MonoBehaviour
         }
         
     }
+    /// <summary>
+    /// Sends the player back to the title screen
+    /// </summary>
     public void BackToTitle()
     {
         SceneManager.LoadScene("MainMenu");
     }
 
+    /// <summary>
+    /// Save the winning game data to the last known used save file
+    /// </summary>
     public void SaveWinGame()
     {
         if (!SaveFiles.instance) return;
@@ -44,6 +51,10 @@ public class WinScreen : MonoBehaviour
         SaveFiles.instance.SaveGame(GameManager.instance.player, new Vector3(30, -22), SaveFiles.instance.chosenSlot, GameManager.instance.totalKills + 1, 1, 4);
     }
 
+    /// <summary>
+    /// Fades the image in and out over time for the credits
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator ImgFade()
     {
         for (float a = 1; a > -1f; a -= .02f)
@@ -65,6 +76,9 @@ public class WinScreen : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switch the images between credits screens
+    /// </summary>
     private void SwitchImage()
     {
         switch(currScreen)

@@ -10,6 +10,7 @@ public class PowerupPickup : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Stores the powerup type for the player to call to
         switch(powerupType)
         {
             case 1:

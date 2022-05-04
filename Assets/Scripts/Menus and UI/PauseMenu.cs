@@ -16,32 +16,44 @@ public class PauseMenu : MonoBehaviour
 
     private int currSaveSlot = 0;
 
+    /// <summary>
+    /// When a slot is clicked, see if it has save data in there already. If not, save the game. If so, ask to confirm overwrite
+    /// </summary>
+    /// <param name="slotNum"></param>
     public void CheckSlot(int slotNum)
     {
         currSaveSlot = slotNum;
         if (!SaveFiles.instance.CheckDataInSlot(currSaveSlot))
         {
-            print("Instant");
             SaveGame();
         }
         else
         {
-            print("Delay");
             ShowConfirmOverwrite();
         }
     }
+    /// <summary>
+    /// Display the save slots menu, and update all slots with their information
+    /// </summary>
     public void ShowSaveSlots()
     {
         saveSlots.SetActive(true);
         pauseMenu.SetActive(false);
         SaveFiles.instance.UpdateAllSlots();
     }
+    /// <summary>
+    /// Hide save slots display
+    /// </summary>
     public void HideSaveSlots()
     {
         saveSlots.SetActive(false);
         pauseMenu.SetActive(true);
         confirmOverwrite.SetActive(false);
     }
+    /// <summary>
+    /// Saves the game, taking all relevant information from the GameManager and calling on the SaveFiles
+    /// If there was data in the slot being saved to, delete it
+    /// </summary>
     public void SaveGame()
     {
         if(SaveFiles.instance.CheckDataInSlot(currSaveSlot))
@@ -60,54 +72,73 @@ public class PauseMenu : MonoBehaviour
         SaveFiles.instance.UpdateAllSlots();
     }
 
+    /// <summary>
+    /// Displays the menu warning for returning to the main menu
+    /// </summary>
     public void ShowMenuWarning()
     {
-        // Pop up Are You Sure?
-        // Unsaved progress will be lost
         menuWarning.SetActive(true);
         pauseMenu.SetActive(false);
     }
+    /// <summary>
+    /// Hides the menu warning
+    /// </summary>
     public void HideMenuWarning()
     {
         menuWarning.SetActive(false);
         pauseMenu.SetActive(true);
     }
 
+    /// <summary>
+    /// Displays the warning for overwriting a save file
+    /// </summary>
     public void ShowConfirmOverwrite()
     {
         confirmOverwrite.SetActive(true);
     }
+    /// <summary>
+    /// Hides the warning for overwriting a save file
+    /// </summary>
     public void HideConfirmOverwrite()
     {
         confirmOverwrite.SetActive(false);
     }
 
+    /// <summary>
+    /// Returns the player to the main menu
+    /// </summary>
     public void BackToMenu()
     {
         SceneManager.LoadScene("MainMenu");
     }
 
-    // Also for Game Over
+    /// <summary>
+    /// Display the quit warning, all unsaved progress will be lost
+    /// </summary>
     public void ShowQuitWarning()
     {
-        // Pop up Are You Sure?
-        // Unsaved progress will be lost
         quitWarning.SetActive(true);
         pauseMenu.SetActive(false);
     }
-
+    /// <summary>
+    /// Hide the quit warning
+    /// </summary>
     public void HideQuitWarning()
     {
         quitWarning.SetActive(false);
         pauseMenu.SetActive(true);
     }
 
-    // Also for Game Over
+    /// <summary>
+    /// Quits the game
+    /// </summary>
     public void QuitGame()
     {
         Application.Quit();
     }
-
+    /// <summary>
+    /// Re-finds all menus and buttons upon returning to the game scene after loading
+    /// </summary>
     public void FindMenuElements()
     {
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
@@ -126,6 +157,9 @@ public class PauseMenu : MonoBehaviour
         menuWarning.SetActive(false);
     }
 
+    /// <summary>
+    /// Sets all pause menu buttons with their appropriate onClick functions
+    /// </summary>
     private void SetButtonFunctions()
     {
         Button[] allButtons = FindObjectsOfType<Button>();

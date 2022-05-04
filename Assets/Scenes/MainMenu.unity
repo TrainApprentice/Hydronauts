@@ -234,6 +234,7 @@ MonoBehaviour:
   winTrack: {fileID: 8300000, guid: 4cef5f35340f1bc47976a8c1b1c8177d, type: 3}
   loseTrack: {fileID: 8300000, guid: 879e69b721e06a542aba84e27f05fb9e, type: 3}
   main: {fileID: 1408438478}
+  currTrack: 
 --- !u!82 &1408438478
 AudioSource:
   m_ObjectHideFlags: 0
@@ -248,7 +249,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

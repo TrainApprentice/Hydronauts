@@ -52,6 +52,7 @@ public class BossMovement : MonoBehaviour
 
         sound = GetComponent<AudioSource>();
 
+        // Move the boss into starting position for the fight
         SetNewLocation(controller.fireAttackPositions[2].position + new Vector3(2, 0), true, 0, true);
     }
 
@@ -60,14 +61,18 @@ public class BossMovement : MonoBehaviour
     {
         if (!controller.isDead)
         {
+            // Moves the boss from point to point, based on what's set in SetNewLocation
             if (currLocation != nextLocation)
             {
                 if (walkTimer < 1) walkTimer += (slowMovement) ? Time.deltaTime / 2 : Time.deltaTime;
                 else walkTimer = 1;
                 currLocation = AnimMath.Lerp(prevLocation, nextLocation, walkTimer);
+
             }
+            else walkTimer = 1;
             transform.position = currLocation;
 
+            // Determines which animation to play, based on which attack is being done
             if (walkTimer == 1 || walkTimer == 0)
             {
                 if (doingSlam) AnimSlam();
@@ -77,10 +82,21 @@ public class BossMovement : MonoBehaviour
             }
             if (doingRush) AnimRush();
             else if (walkTimer != 0 && walkTimer != 1) AnimWalk();
+            bool test = (currLocation == nextLocation);
+            Debug.LogError(test + ", Walk: " + walkTimer);
+            //Debug.LogError("Walk: " + walkTimer + ",\n Slam: " + doingSlam + ",\n Shock: " + doingShockwave + ",\n Flame: " + doingFlames + ",\n Rush: " + doingRush);
         }
         else AnimDeath();
     }
 
+    /// <summary>
+    /// This sets a new location for the boss to move to, setting the newLocation and prevLocation for the movement
+    /// Allows for various inputs to determine if this is slower movement, movement for an attack, or it should reset the walk timer
+    /// </summary>
+    /// <param name="newPos"></param>
+    /// <param name="doSlow"></param>
+    /// <param name="attackType"></param>
+    /// <param name="resetWalk"></param>
     public void SetNewLocation(Vector3 newPos, bool doSlow = false, int attackType = 0, bool resetWalk = true)
     {
         if(resetWalk) walkTimer = 0;
@@ -107,10 +123,16 @@ public class BossMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets doingRush to true, which will trigger a rush attack
+    /// </summary>
     public void BeginRush()
     {
         doingRush = true;
     }
+    /// <summary>
+    /// Runs the animation for the slam attack, as well as the hitbox
+    /// </summary>
     private void AnimSlam()
     {
         
@@ -261,6 +283,9 @@ public class BossMovement : MonoBehaviour
             
         }
     }
+    /// <summary>
+    /// Runs the animation for the shockwave attack, as well as indicating when to summon debris
+    /// </summary>
     private void AnimShockwave()
     {
         ResetTimers();
@@ -412,6 +437,9 @@ public class BossMovement : MonoBehaviour
 
         }
     }
+    /// <summary>
+    /// Runs the animation for the rush attack, as well as the hitbox
+    /// </summary>
     private void AnimRush()
     {
         rushAttackDuration += Time.deltaTime;
@@ -543,6 +571,10 @@ public class BossMovement : MonoBehaviour
             rightElbow.EaseToNewRotation(rightElbowGoalRot, moveTimer);
         }
     }
+
+    /// <summary>
+    /// Runs the animation for the flamethrower attack, determining what to move based on which pattern is being used
+    /// </summary>
     private void AnimFlamethrower()
     {
         if(flameAttackDuration == 0) controller.isAttackingFire = true;
@@ -587,6 +619,9 @@ public class BossMovement : MonoBehaviour
             leftElbow.EaseToNewRotation(leftElbowGoalRot, .001f);
         }
     }
+    /// <summary>
+    /// Runs the idle animation and resets various animation timers
+    /// </summary>
     private void AnimIdle()
     {
         doSoundOnce = true;
@@ -620,6 +655,9 @@ public class BossMovement : MonoBehaviour
         
         
     }
+    /// <summary>
+    /// Runs the walk animation
+    /// </summary>
     private void AnimWalk()
     {
         animWalkTimer += Time.deltaTime;
@@ -654,6 +692,9 @@ public class BossMovement : MonoBehaviour
         
         
     }
+    /// <summary>
+    /// Runs the death animation
+    /// </summary>
     private void AnimDeath()
     {
         animDeathTimer += Time.deltaTime;
@@ -748,36 +789,15 @@ public class BossMovement : MonoBehaviour
 
         }
     }
+    /// <summary>
+    /// A function to reset any or all animation timers used by the various animation methods
+    /// </summary>
+    /// <param name="currAnim"></param>
     void ResetTimers(string currAnim = "none")
     {
         animIdleTimer = (currAnim == "IDLE") ? animIdleTimer : 0;
         animWalkTimer = (currAnim == "WALK") ? animWalkTimer : 0;
     }
 
-    void EaseAllJointsToStart(float timer)
-    {
-        baseSkeleton.EaseToStartPosition(timer);
-        baseSkeleton.EaseToStartRotation(timer);
-        baseBody.EaseToStartPosition(timer);
-        baseBody.EaseToStartRotation(timer);
-
-        leftShoulder.EaseToStartPosition(timer);
-        leftShoulder.EaseToStartRotation(timer);
-        leftElbow.EaseToStartPosition(timer);
-        leftElbow.EaseToStartRotation(timer);
-        leftHip.EaseToStartPosition(timer);
-        leftHip.EaseToStartRotation(timer);
-        leftKnee.EaseToStartPosition(timer);
-        leftKnee.EaseToStartRotation(timer);
-
-        rightShoulder.EaseToStartPosition(timer);
-        rightShoulder.EaseToStartRotation(timer);
-        rightElbow.EaseToStartPosition(timer);
-        rightElbow.EaseToStartRotation(timer);
-        rightHip.EaseToStartPosition(timer);
-        rightHip.EaseToStartRotation(timer);
-        rightKnee.EaseToStartPosition(timer);
-        rightKnee.EaseToStartRotation(timer);
-    }
-
+    
 }

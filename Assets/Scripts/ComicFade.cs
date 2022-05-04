@@ -18,12 +18,18 @@ public class ComicFade : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Countdown the lifespan
         lifespan -= Time.deltaTime;
+
+        // Increase the comic's size over time for most of the duration
         if (lifespan > .25f) displayText.fontSize += Time.deltaTime * 8;
 
         if (lifespan <= 0) Destroy(gameObject);
     }
 
+    /// <summary>
+    /// Randomizes the text displayed by the comic efect
+    /// </summary>
     void RandomText()
     {
         int rand = Mathf.FloorToInt(Random.Range(0, 5));

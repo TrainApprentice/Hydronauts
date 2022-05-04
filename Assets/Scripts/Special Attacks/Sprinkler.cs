@@ -23,11 +23,13 @@ public class Sprinkler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Countdown the sprinkler's lifetime
         if (lifespan > 0) lifespan -= Time.deltaTime;
         else Destroy(gameObject);
 
         transform.position = owner.position;
 
+        // Countdown the damage interval, and turn on or off the hitbox accordingly
         if (damageInterval > 0)
         {
             damageInterval -= Time.deltaTime;
@@ -38,10 +40,10 @@ public class Sprinkler : MonoBehaviour
             hitbox.enabled = true;
             damageInterval = .33333f;
         }
-        //FadeColor();
+        
 
     }
-
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))

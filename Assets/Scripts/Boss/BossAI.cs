@@ -57,6 +57,8 @@ public class BossAI : MonoBehaviour
         {
             if (iFrames > 0) iFrames -= Time.deltaTime;
             else iFrames = 0;
+            
+            // This runs the state machine, counting down between attacks and randomly determining which one to do based on the current phase
             if (timeBetweenAttacks > 0) timeBetweenAttacks -= Time.deltaTime;
             else
             {
@@ -112,12 +114,16 @@ public class BossAI : MonoBehaviour
 
                 }
             }
+            
 
             if (isAttackingFire) FlamethrowerPattern(flamePattern);
         }
         
     }
-
+    /// <summary>
+    /// This runs the creation of flames for the flamethrower attack, taking in an int to determine which pattern is used
+    /// </summary>
+    /// <param name="choosePattern"></param>
     public void FlamethrowerPattern(int choosePattern)
     {
         if (timeBetweenFlames > 0) timeBetweenFlames -= Time.deltaTime;
@@ -156,6 +162,10 @@ public class BossAI : MonoBehaviour
         }
         
     }
+    /// <summary>
+    /// This function is called outside of the class, and is used to decrease the health of the boss by a certain amount
+    /// </summary>
+    /// <param name="damage"></param>
     public void ApplyDamage(float damage)
     {
         if(iFrames == 0)
@@ -174,23 +184,38 @@ public class BossAI : MonoBehaviour
         
     }
 
+    /// <summary>
+    ///  Indicates to the BossMovement script to start moving toward a flamethrower position, and ready the flamethrower animation
+    /// </summary>
     public void FlamethrowerAttack()
     {
         mover.SetNewLocation(fireAttackPositions[flamePattern - 1].position, (currPhase < 2), flamePattern + 5);
     }
+    /// <summary>
+    /// Indicates to the BossMovement script to start moving for a slam attack
+    /// </summary>
     public void SlamAttack()
     {
         mover.SetNewLocation(playerRef.position - new Vector3(3f, -2.5f, 0), false, 1);
     }
-
+    /// <summary>
+    /// Indicates to the BossMovement script to start moving for a shockwave attack
+    /// </summary>
     public void ShockwaveAttack() 
     {
         mover.SetNewLocation(shockwavePos.position, false, 2);
     }
+
+    /// <summary>
+    /// Indicates to the BossMovement script to start moving for a rush attack
+    /// </summary>
     public void RushAttack()
     {
         mover.BeginRush();
     }
+    /// <summary>
+    /// Used by the BossMovement script's AnimShockwave to summon falling debris around the boss
+    /// </summary>
     public void SummonDebris()
     {
         float randChance = Random.Range(0, 1);
@@ -203,10 +228,16 @@ public class BossAI : MonoBehaviour
             GameObject newDebris = Instantiate(fallingDebris);
         }
     }
+
+    /// <summary>
+    /// Called by the BossMovement script to switch the hitbox on or off for slam and shockwave attacks
+    /// </summary>
+    /// <param name="turnOn"></param>
     public void SlamHitboxSwap(bool turnOn)
     {
         slamHitbox.SetActive(turnOn);
     }
+
 
    
 }

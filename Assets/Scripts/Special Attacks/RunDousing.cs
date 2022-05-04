@@ -6,6 +6,7 @@ public class RunDousing : MonoBehaviour
 {
     private FireObstacle currFire;
 
+    // Check which fire is being overlapped, and deal damage to it
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Fire"))

@@ -35,6 +35,10 @@ public class FistBehavior : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// When the fist collides with an enemy, spawn a word sound effect randomly in the direction they were punched
+    /// </summary>
+    /// <param name="enemyPos"></param>
     private void SpawnComic(Vector2 enemyPos)
     {
         var dir = (master.transform.localScale.x < 0) ? "right" : "left";

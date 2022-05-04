@@ -39,7 +39,7 @@ public class EnemyMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        // Runs invincibility frames, showing the health bar when invincible
         if (iFrames > 0)
         {
             iFrames -= Time.deltaTime;
@@ -55,6 +55,7 @@ public class EnemyMain : MonoBehaviour
             
         }
 
+        // Make sure the animator's values are reset for the next animation
         if (animResetTimer > 0) animResetTimer -= Time.deltaTime;
         else
         {
@@ -65,7 +66,10 @@ public class EnemyMain : MonoBehaviour
 
 
     }
-
+    /// <summary>
+    /// Used by other classes to deal damage to the enemy
+    /// </summary>
+    /// <param name="damage"></param>
     public void ApplyDamage(float damage)
     {
         if(iFrames == 0)
@@ -84,7 +88,9 @@ public class EnemyMain : MonoBehaviour
         
         if (health <= 0) isDead = true;
     }
-
+    /// <summary>
+    /// Updates the health bar for each enemy type, as they work on different scales
+    /// </summary>
     private void UpdateHealthBar()
     {
         switch(enemyType)
@@ -108,7 +114,10 @@ public class EnemyMain : MonoBehaviour
         
         
     }
-
+    /// <summary>
+    /// Updates a given bool in the animator to true, and sets the reset timer to prepare for the next one
+    /// </summary>
+    /// <param name="varUpdate"></param>
     private void AnimUpdate(string varUpdate)
     {
         masterAnim.SetBool(varUpdate, true);

@@ -12,29 +12,30 @@ public class FireProjectile : MonoBehaviour
     public float angle;
     public int damage = 2;
 
-    // Start is called before the first frame update
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
         angle *= Mathf.PI / 180;
     }
 
-    // Update is called once per frame
+
     void Update()
     {
+        // Countdown lifetime
         lifetime -= Time.deltaTime;
         
-
+        // Change the scale and opacity based on lifetime
         float p = 1 - lifetime;
         size = AnimMath.Lerp(size, maxSize, p);
         transform.localScale = new Vector3(size, size, 1);
-
         sprite.color = new Color(1, 1, 1, lifetime);
 
+        // Move the flame in the correct direction, with some friction
         Vector3 direction = new Vector3(moveSpeed * Mathf.Cos(angle) * Time.deltaTime, moveSpeed * Mathf.Sin(angle) * Time.deltaTime, 0);
         moveSpeed *= .999f;
         transform.position += direction;
 
+        // When lifetime runs out, destroy the fire
         if (lifetime <= 0) Destroy(gameObject);
     }
 }
